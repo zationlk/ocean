@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, ChevronDown, Sparkles, Heart, GitCompare } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Sparkles, Heart, GitCompare, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteSettings } from "@/lib/data";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
+import SearchModal from "@/components/ui/SearchModal";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -33,6 +34,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const { items: wishlistItems } = useWishlist();
   const { items: compareItems } = useCompare();
@@ -43,12 +45,23 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => { setIsMobileOpen(false); }, [pathname]);
+
+  // Cmd/Ctrl+K opens search
   useEffect(() => {
-    setIsMobileOpen(false);
-  }, [pathname]);
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <>
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       {/* Top bar */}
       <div className="bg-brand-dark text-white text-sm py-2 hidden md:block border-b border-white/5">
         <div className="container-custom flex justify-between items-center">
@@ -148,6 +161,16 @@ export default function Navbar() {
 
             {/* CTA buttons */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Search */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-brand-text/60 hover:text-gold hover:bg-gold/10 border border-brand-border hover:border-gold/30 transition-all text-xs"
+                aria-label="Search"
+              >
+                <Search size={16} />
+                <span className="hidden xl:inline">Search</span>
+                <kbd className="hidden xl:inline text-[10px] bg-brand-obsidian border border-brand-border rounded px-1.5 py-0.5 text-brand-text/40">⌘K</kbd>
+              </button>
               {/* Wishlist icon */}
               <Link
                 href="/wishlist"
@@ -237,6 +260,12 @@ export default function Navbar() {
                 </div>
               ))}
               <div className="pt-4 flex flex-col gap-3">
+                <button
+                  onClick={() => { setIsMobileOpen(false); setSearchOpen(true); }}
+                  className="flex items-center justify-center gap-2 border border-brand-border text-brand-text hover:border-gold/30 hover:text-gold font-semibold py-3 rounded-lg transition-colors"
+                >
+                  <Search size={18} /> Search Products
+                </button>
                 <a
                   href={`https://wa.me/${siteSettings.whatsapp}`}
                   target="_blank"

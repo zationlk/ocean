@@ -128,14 +128,12 @@ export default function ProductsClient() {
         </div>
 
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-20 bg-brand-charcoal rounded-2xl border border-brand-border shadow-sm">
-            <p className="text-brand-text text-lg font-light">No premium masterpieces found matching your filters.</p>
+          <div className="text-center py-20 bg-brand-charcoal rounded-2xl border border-brand-border">
+            <Package size={40} className="mx-auto mb-3 text-brand-text/20" />
+            <p className="text-brand-text text-lg font-light">No products found matching your filters.</p>
             <button
-              onClick={() => {
-                setSelectedCategory("all");
-                setSearchQuery("");
-              }}
-              className="mt-4 text-gold hover:underline font-semibold"
+              onClick={() => { setSelectedCategory("all"); setSearchQuery(""); }}
+              className="mt-4 text-gold hover:underline font-semibold text-sm"
             >
               Reset Filters
             </button>

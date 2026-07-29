@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, MessageCircle, Heart, GitCompare } from "lucide-react";
+import { Eye, MessageCircle, Heart, GitCompare, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteSettings } from "@/lib/data";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
+import QuickView from "@/components/ui/QuickView";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -32,6 +34,7 @@ interface Product {
 export default function ProductCard({ product }: ProductCardProps) {
   const { add, remove, isInWishlist } = useWishlist();
   const { add: addCompare, remove: removeCompare, isInCompare, items: compareItems } = useCompare();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
 
@@ -87,6 +90,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="group bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden product-card hover:border-gold/50 hover:shadow-gold-glow">
+      <QuickView product={quickViewOpen ? (product as Parameters<typeof QuickView>[0]["product"]) : null} onClose={() => setQuickViewOpen(false)} />
       {/* Image */}
       <div className="relative h-56 overflow-hidden bg-brand-obsidian">
         <img
@@ -146,12 +150,20 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Hover overlay with actions */}
         <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-0">
+          <button
+            onClick={(e) => { e.preventDefault(); setQuickViewOpen(true); }}
+            className="w-10 h-10 bg-brand-charcoal/90 rounded-full flex items-center justify-center hover:bg-gold hover:text-brand-dark border border-brand-border/50 transition-colors shadow-lg"
+            aria-label="Quick view"
+            title="Quick view"
+          >
+            <Maximize2 size={15} className="text-white" />
+          </button>
           <Link
             href={`/products/${product.slug}`}
             className="w-10 h-10 bg-brand-charcoal/90 rounded-full flex items-center justify-center hover:bg-gold hover:text-brand-dark border border-brand-border/50 transition-colors shadow-lg"
             aria-label="View product"
           >
-            <Eye size={16} className="text-white hover:text-brand-dark" />
+            <Eye size={16} className="text-white" />
           </Link>
           <a
             href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
