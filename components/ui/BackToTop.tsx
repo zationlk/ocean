@@ -31,23 +31,16 @@ export default function BackToTop() {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
         "fixed bottom-24 right-5 z-40 w-12 h-12 flex items-center justify-center",
-        "bg-white rounded-full shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1",
-        "border border-brand-border hover:border-brand-primary"
+        "bg-brand-charcoal rounded-full transition-all duration-300 hover:-translate-y-1",
+        "border border-brand-border hover:border-gold/50 hover:shadow-gold-glow"
       )}
       aria-label="Back to top"
     >
-      {/* SVG progress ring */}
-      <svg
-        className="absolute inset-0 w-full h-full -rotate-90"
-        viewBox="0 0 48 48"
-        fill="none"
-      >
-        <circle cx="24" cy="24" r={r} stroke="#E0E0E0" strokeWidth="2.5" />
+      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <circle cx="24" cy="24" r={r} stroke="#1D1D22" strokeWidth="2.5" />
         <circle
-          cx="24"
-          cy="24"
-          r={r}
-          stroke="#006060"
+          cx="24" cy="24" r={r}
+          stroke="#D4AF37"
           strokeWidth="2.5"
           strokeDasharray={circ}
           strokeDashoffset={offset}
@@ -55,7 +48,7 @@ export default function BackToTop() {
           className="transition-all duration-200"
         />
       </svg>
-      <ChevronUp size={18} className="text-brand-primary relative z-10" />
+      <ChevronUp size={18} className="text-gold relative z-10" />
     </button>
   );
 }

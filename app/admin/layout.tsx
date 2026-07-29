@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast";
 import AdminLayoutClient from "./AdminLayoutClient";
 
 export const metadata: Metadata = {
-  title: "Admin Panel – Ocean Lighting Solutions",
+  title: "Admin Panel – OCEAN",
 };
 
 export default function AdminLayout({
@@ -19,9 +19,10 @@ export default function AdminLayout({
         toastOptions={{
           duration: 4000,
           style: {
-            background: "#006060",
-            color: "#fff",
-            borderRadius: "8px",
+            background: "#D4AF37",
+            color: "#0F0F11",
+            borderRadius: "12px",
+            fontWeight: "bold",
           },
         }}
       />

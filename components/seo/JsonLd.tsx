@@ -17,8 +17,8 @@ export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Ocean Lighting Solutions",
-    description: "Sri Lanka's trusted importer and dealer of premium LED lighting, electrical items, and interior solutions",
+    name: "OCEAN Lighting Solutions",
+    description: "Sri Lanka's premier brand for high-end LED lighting, electrical installations, and luxury OCEANA bathware solutions.",
     url: "https://www.oceanlighting.lk",
     logo: "https://www.oceanlighting.lk/logo.png",
     address: {
@@ -44,8 +44,8 @@ export function generateOrganizationSchema() {
 export function generateLocalBusinessSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "LightingStore",
-    name: "Ocean Lighting Solutions",
+    "@type": "HomeGoodsStore",
+    name: "OCEAN Lighting Solutions",
     image: "https://www.oceanlighting.lk/logo.png",
     address: {
       "@type": "PostalAddress",
@@ -74,7 +74,7 @@ export function generateLocalBusinessSchema() {
         closes: "16:00",
       },
     ],
-    priceRange: "$$",
+    priceRange: "$$$",
   }
 }
 

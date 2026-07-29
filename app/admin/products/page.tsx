@@ -116,7 +116,7 @@ export default function AdminProductsPage() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-teal-500 transition-all"
+            className="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-gold/50 transition-all"
           />
           {search && (
             <button
@@ -132,7 +132,7 @@ export default function AdminProductsPage() {
       {/* Table */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-gray-200 p-16 text-center">
-          <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-gray-500 mt-3 text-sm">Loading products…</p>
         </div>
       ) : (
@@ -144,7 +144,7 @@ export default function AdminProductsPage() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="mt-2 text-sm text-teal-600 hover:underline"
+                  className="mt-2 text-sm text-gold hover:underline"
                 >
                   Clear search
                 </button>
@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
                             </span>
                           )}
                           {product.isNew && (
-                            <span className="text-xs bg-teal-50 text-teal-600 font-medium px-2 py-0.5 rounded-full border border-teal-200">
+                            <span className="text-xs bg-gold-50 text-gold-700 font-medium px-2 py-0.5 rounded-full border border-gold-200">
                               New
                             </span>
                           )}
@@ -227,7 +227,7 @@ export default function AdminProductsPage() {
                           <Link
                             href={`/products/${product.slug}`}
                             target="_blank"
-                            className="p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 hover:text-gold hover:bg-gold-50 rounded-lg transition-colors"
                             title="View on site"
                           >
                             <Eye size={16} />

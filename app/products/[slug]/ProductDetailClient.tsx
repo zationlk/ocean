@@ -16,14 +16,16 @@ export default function ProductDetailClient({ product, related }: Props) {
   const [activeImage, setActiveImage] = useState(0);
   const [activeTab, setActiveTab] = useState<"description" | "specs" | "features">("description");
 
+  const isBathware = !product.category?.startsWith("led-");
+  const brandName = isBathware ? "OCEANA" : "OCEAN Lighting Solutions";
   const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}". Could you please provide more details and pricing?`
+    `Hello! I'm interested in the "${product.name}" from ${brandName}. Could you please provide more details and pricing?`
   );
 
   return (
     <div className="min-h-screen bg-brand-bg">
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-brand-border">
+      <div className="bg-brand-charcoal border-b border-brand-border">
         <div className="container-custom py-4">
           <nav className="flex items-center gap-2 text-sm text-brand-text">
             <Link href="/" className="hover:text-brand-primary transition-colors">Home</Link>
@@ -37,7 +39,7 @@ export default function ProductDetailClient({ product, related }: Props) {
               {product.category.replace(/-/g, " ")}
             </Link>
             <ChevronRight size={14} />
-            <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
+            <span className="text-white font-medium truncate max-w-[200px]">{product.name}</span>
           </nav>
         </div>
       </div>
@@ -57,7 +59,7 @@ export default function ProductDetailClient({ product, related }: Props) {
           {/* Images */}
           <div>
             {/* Main image */}
-            <div className="relative rounded-2xl overflow-hidden bg-white border border-brand-border mb-4 aspect-square">
+            <div className="relative rounded-2xl overflow-hidden bg-brand-charcoal border border-brand-border mb-4 aspect-square">
               <img
                 src={product.images[activeImage]}
                 alt={product.name}
@@ -79,7 +81,7 @@ export default function ProductDetailClient({ product, related }: Props) {
                     onClick={() => setActiveImage(i)}
                     className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                       activeImage === i
-                        ? "border-brand-primary shadow-teal-glow"
+                        ? "border-brand-primary shadow-gold-glow"
                         : "border-brand-border hover:border-brand-light"
                     }`}
                   >
@@ -98,7 +100,7 @@ export default function ProductDetailClient({ product, related }: Props) {
             </div>
 
             {/* Name */}
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
               {product.name}
             </h1>
 
@@ -110,12 +112,12 @@ export default function ProductDetailClient({ product, related }: Props) {
             {/* Key features preview */}
             {product.features && (
               <div className="mb-8">
-                <h3 className="font-semibold text-gray-900 mb-3">Key Features</h3>
+                <h3 className="font-semibold text-white mb-3">Key Features</h3>
                 <ul className="space-y-2">
                   {product.features.slice(0, 4).map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-sm text-brand-text">
-                      <div className="w-5 h-5 bg-teal-50 rounded-full flex items-center justify-center shrink-0">
-                        <Check size={12} className="text-brand-primary" />
+                      <div className="w-5 h-5 bg-gold/10 rounded-full flex items-center justify-center shrink-0 border border-gold/20">
+                        <Check size={12} className="text-gold" />
                       </div>
                       {feature}
                     </li>
@@ -140,14 +142,14 @@ export default function ProductDetailClient({ product, related }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
-                  className="flex items-center justify-center gap-2 border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                  className="flex items-center justify-center gap-2 border-2 border-brand-primary text-gold hover:bg-brand-primary hover:text-brand-dark font-semibold py-3 rounded-xl transition-all duration-300"
                 >
                   <Phone size={18} />
                   Call Us
                 </a>
                 <Link
                   href="/contact"
-                  className="flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-dark text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                  className="flex items-center justify-center gap-2 bg-brand-primary hover:bg-gold-600 text-brand-dark font-bold py-3 rounded-xl transition-all duration-300"
                 >
                   <MessageCircle size={18} />
                   Get Quote
@@ -158,7 +160,7 @@ export default function ProductDetailClient({ product, related }: Props) {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl border border-brand-border overflow-hidden mb-16">
+        <div className="bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden mb-16">
           {/* Tab headers */}
           <div className="flex border-b border-brand-border">
             {(["description", "specs", "features"] as const).map((tab) => (
@@ -167,7 +169,7 @@ export default function ProductDetailClient({ product, related }: Props) {
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-4 text-sm font-semibold capitalize transition-colors ${
                   activeTab === tab
-                    ? "text-brand-primary border-b-2 border-brand-primary bg-teal-50"
+                    ? "text-gold border-b-2 border-gold bg-gold/10"
                     : "text-brand-text hover:text-brand-primary"
                 }`}
               >
@@ -188,7 +190,7 @@ export default function ProductDetailClient({ product, related }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(product.specifications).map(([key, value]) => (
                   <div key={key} className="flex items-center gap-3 p-3 bg-brand-bg rounded-xl">
-                    <span className="text-sm font-semibold text-gray-900 min-w-[140px]">{key}</span>
+                    <span className="text-sm font-semibold text-white min-w-[140px]">{key}</span>
                     <span className="text-sm text-brand-text">{value}</span>
                   </div>
                 ))}
@@ -199,7 +201,7 @@ export default function ProductDetailClient({ product, related }: Props) {
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {product.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-3 p-3 bg-brand-bg rounded-xl">
-                    <div className="w-6 h-6 bg-teal-gradient rounded-full flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 bg-gold-gradient rounded-full flex items-center justify-center shrink-0">
                       <Check size={12} className="text-white" />
                     </div>
                     <span className="text-sm text-brand-text">{feature}</span>
@@ -213,7 +215,7 @@ export default function ProductDetailClient({ product, related }: Props) {
         {/* Related products */}
         {related.length > 0 && (
           <div>
-            <h2 className="font-display text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="font-display text-2xl font-bold text-white mb-8">
               Related Products
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

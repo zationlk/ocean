@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, ChevronDown, Zap, Heart, GitCompare } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Sparkles, Heart, GitCompare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteSettings } from "@/lib/data";
 import { useWishlist } from "@/context/WishlistContext";
@@ -15,11 +15,12 @@ const navLinks = [
     href: "/products",
     label: "Products",
     children: [
-      { href: "/products?category=led-lighting", label: "LED Lighting" },
-      { href: "/products?category=indoor-lighting", label: "Indoor Lighting" },
-      { href: "/products?category=outdoor-lighting", label: "Outdoor Lighting" },
-      { href: "/products?category=electrical-items", label: "Electrical Items" },
-      { href: "/products?category=interior-solutions", label: "Interior Solutions" },
+      { href: "/products?category=led-indoor-lighting", label: "LED Indoor Lighting" },
+      { href: "/products?category=led-outdoor-lighting", label: "LED Outdoor Lighting" },
+      { href: "/products?category=luxury-sanitaryware", label: "Luxury Sanitaryware" },
+      { href: "/products?category=designer-showers-faucets", label: "Designer Showers & Faucets" },
+      { href: "/products?category=premium-bathtubs", label: "Premium Bathtubs & Jacuzzis" },
+      { href: "/products?category=bathroom-accessories", label: "Smart Mirrors & Accessories" },
     ],
   },
   { href: "/projects", label: "Projects" },
@@ -49,29 +50,29 @@ export default function Navbar() {
   return (
     <>
       {/* Top bar */}
-      <div className="bg-brand-dark text-white text-sm py-2 hidden md:block">
+      <div className="bg-brand-dark text-white text-sm py-2 hidden md:block border-b border-white/5">
         <div className="container-custom flex justify-between items-center">
-          <span className="text-teal-200 text-xs">
+          <span className="text-gold-light text-xs tracking-wider">
             📍 {siteSettings.address}
           </span>
           <div className="flex items-center gap-6">
             <a
               href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 hover:text-teal-300 transition-colors"
+              className="flex items-center gap-1.5 hover:text-gold transition-colors text-xs"
             >
-              <Phone size={12} />
+              <Phone size={12} className="text-gold" />
               <span>{siteSettings.telephone}</span>
             </a>
             <a
               href={`tel:${siteSettings.mobile.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 hover:text-teal-300 transition-colors"
+              className="flex items-center gap-1.5 hover:text-gold transition-colors text-xs"
             >
-              <Phone size={12} />
+              <Phone size={12} className="text-gold" />
               <span>{siteSettings.mobile}</span>
             </a>
             <a
               href={`mailto:${siteSettings.email}`}
-              className="hover:text-teal-300 transition-colors"
+              className="hover:text-gold transition-colors text-xs"
             >
               {siteSettings.email}
             </a>
@@ -84,23 +85,23 @@ export default function Navbar() {
         className={cn(
           "sticky top-0 z-50 transition-all duration-300",
           isScrolled
-            ? "bg-white shadow-lg border-b border-brand-border"
-            : "bg-white border-b border-brand-border"
+            ? "bg-brand-obsidian/95 backdrop-blur-md shadow-lg border-b border-brand-border"
+            : "bg-brand-obsidian border-b border-brand-border"
         )}
       >
         <div className="container-custom">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-teal-gradient rounded-xl flex items-center justify-center shadow-teal-glow group-hover:shadow-teal-glow-lg transition-all duration-300">
-                <Zap size={20} className="text-white" />
+              <div className="w-10 h-10 bg-gold-gradient rounded-xl flex items-center justify-center shadow-gold-glow group-hover:shadow-gold-glow-lg transition-all duration-300">
+                <Sparkles size={20} className="text-white animate-pulse" />
               </div>
               <div>
-                <div className="font-display font-bold text-lg leading-tight text-gray-900">
-                  Ocean Lighting
+                <div className="font-display font-bold text-lg md:text-xl tracking-wider text-white group-hover:text-gold transition-colors leading-none">
+                  OCEAN
                 </div>
-                <div className="text-xs text-brand-primary font-medium leading-tight">
-                  Solutions
+                <div className="text-[9px] text-gold font-semibold tracking-wider uppercase leading-none mt-1">
+                  Lighting Solutions
                 </div>
               </div>
             </Link>
@@ -119,8 +120,8 @@ export default function Navbar() {
                     className={cn(
                       "nav-link flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                       pathname === link.href
-                        ? "text-brand-primary bg-teal-50"
-                        : "text-gray-700 hover:text-brand-primary hover:bg-teal-50"
+                        ? "text-gold bg-gold/10"
+                        : "text-gray-300 hover:text-gold hover:bg-gold/10"
                     )}
                   >
                     {link.label}
@@ -129,12 +130,12 @@ export default function Navbar() {
 
                   {/* Dropdown */}
                   {link.children && activeDropdown === link.label && (
-                    <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-card-hover border border-brand-border overflow-hidden z-50 animate-fade-in">
+                    <div className="absolute top-full left-0 mt-1 w-64 bg-brand-charcoal rounded-xl shadow-card-hover border border-brand-border overflow-hidden z-50 animate-fade-in">
                       {link.children.map((child) => (
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 hover:text-brand-primary transition-colors border-b border-brand-border last:border-0"
+                          className="block px-4 py-3 text-sm text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors border-b border-brand-border last:border-0"
                         >
                           {child.label}
                         </Link>
@@ -150,7 +151,7 @@ export default function Navbar() {
               {/* Wishlist icon */}
               <Link
                 href="/wishlist"
-                className="relative p-2.5 rounded-lg text-gray-600 hover:text-brand-primary hover:bg-teal-50 transition-colors"
+                className="relative p-2.5 rounded-lg text-gray-300 hover:text-gold hover:bg-gold/10 transition-colors"
                 aria-label="Wishlist"
               >
                 <Heart size={20} />
@@ -164,7 +165,7 @@ export default function Navbar() {
               {compareItems.length > 0 && (
                 <Link
                   href="/compare"
-                  className="relative p-2.5 rounded-lg text-gray-600 hover:text-brand-primary hover:bg-teal-50 transition-colors"
+                  className="relative p-2.5 rounded-lg text-gray-300 hover:text-gold hover:bg-gold/10 transition-colors"
                   aria-label="Compare"
                 >
                   <GitCompare size={20} />
@@ -186,7 +187,7 @@ export default function Navbar() {
               </a>
               <Link
                 href="/contact"
-                className="bg-brand-primary hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all duration-300 hover:shadow-teal-glow"
+                className="bg-brand-primary hover:bg-gold-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all duration-300 hover:shadow-gold-glow"
               >
                 Get Quote
               </Link>
@@ -195,7 +196,7 @@ export default function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-teal-50 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-gray-300 hover:bg-gold/10 transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -205,7 +206,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {isMobileOpen && (
-          <div className="lg:hidden bg-white border-t border-brand-border shadow-lg animate-slide-up">
+          <div className="lg:hidden bg-brand-obsidian border-t border-brand-border shadow-lg animate-slide-up">
             <div className="container-custom py-4 space-y-1">
               {navLinks.map((link) => (
                 <div key={link.href}>
@@ -214,8 +215,8 @@ export default function Navbar() {
                     className={cn(
                       "block px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                       pathname === link.href
-                        ? "text-brand-primary bg-teal-50"
-                        : "text-gray-700 hover:text-brand-primary hover:bg-teal-50"
+                        ? "text-gold bg-gold/10"
+                        : "text-gray-300 hover:text-gold hover:bg-gold/10"
                     )}
                   >
                     {link.label}
@@ -226,7 +227,7 @@ export default function Navbar() {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="block px-4 py-2 text-sm text-gray-600 hover:text-brand-primary hover:bg-teal-50 rounded-lg transition-colors"
+                          className="block px-4 py-2 text-sm text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors"
                         >
                           {child.label}
                         </Link>

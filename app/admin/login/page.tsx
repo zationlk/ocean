@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Sparkles, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function AdminLoginPage() {
@@ -48,26 +48,26 @@ export default function AdminLoginPage() {
       <div className="min-h-screen bg-hero-gradient flex items-center justify-center p-4">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold-600/5 rounded-full blur-3xl" />
         </div>
 
         <div className="relative w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                <Zap size={24} className="text-white" />
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/10">
+                <Sparkles size={24} className="text-gold" />
               </div>
               <div className="text-left">
-                <div className="font-display font-bold text-xl text-white">
-                  Ocean Lighting
+                <div className="font-display font-bold text-2xl tracking-widest text-white leading-none">
+                  OCEAN
                 </div>
-                <div className="text-teal-300 text-sm">Admin Panel</div>
+                <div className="text-gold text-xs tracking-wider mt-1 font-semibold uppercase leading-none">Admin Panel</div>
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-white">Sign In</h1>
-            <p className="text-teal-200 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-white tracking-wide">Sign In</h1>
+            <p className="text-gray-300 text-sm mt-1 font-light">
               Access the admin dashboard
             </p>
           </div>
@@ -130,8 +130,8 @@ export default function AdminLoginPage() {
               </div>
 
               {/* Demo hint */}
-              <div className="bg-teal-50 border border-teal-100 rounded-xl p-3 text-sm text-brand-text">
-                <p className="font-semibold text-brand-primary mb-1">Demo credentials</p>
+              <div className="bg-gold-50 border border-gold-100 rounded-xl p-3 text-sm text-brand-text">
+                <p className="font-semibold text-gold-700 mb-1">Demo credentials</p>
                 <p>Email: admin@oceanlighting.lk</p>
                 <p>Password: admin123</p>
               </div>
@@ -139,7 +139,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all duration-300 hover:shadow-teal-glow"
+                className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-gold-600 disabled:opacity-60 disabled:cursor-not-allowed text-brand-dark font-bold py-3.5 rounded-xl transition-all duration-300 hover:shadow-gold-glow"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -11,55 +11,41 @@ export default function CompareBar() {
   if (items.length === 0) return null;
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-brand-primary shadow-2xl",
-        "animate-slide-up"
-      )}
-    >
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-brand-charcoal border-t border-gold/30 shadow-gold-glow animate-slide-up">
       <div className="container-custom py-3">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2 shrink-0">
-            <GitCompare size={18} className="text-brand-primary" />
-            <span className="text-sm font-semibold text-gray-900">
-              Compare ({items.length}/3)
-            </span>
+            <GitCompare size={17} className="text-gold" />
+            <span className="text-sm font-semibold text-gold tracking-wide">Compare</span>
+            <span className="text-sm text-brand-text">({items.length}/3)</span>
           </div>
 
           <div className="flex items-center gap-3 flex-1 flex-wrap">
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-2 bg-brand-bg rounded-xl px-3 py-2 border border-brand-border"
+                className="flex items-center gap-2 bg-brand-obsidian rounded-xl px-3 py-2 border border-brand-border"
               >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-8 h-8 rounded-lg object-cover"
-                />
-                <span className="text-sm text-gray-900 max-w-[140px] truncate font-medium">
-                  {item.name}
-                </span>
+                <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
+                <span className="text-sm text-white max-w-[140px] truncate font-medium">{item.name}</span>
                 <button
                   onClick={() => remove(item.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors ml-1"
+                  className="text-brand-text/50 hover:text-red-400 transition-colors ml-1"
                   aria-label="Remove from compare"
                 >
                   <X size={14} />
                 </button>
               </div>
             ))}
-
-            {/* Empty slots */}
             {Array.from({ length: 3 - items.length }).map((_, i) => (
               <div
                 key={`empty-${i}`}
-                className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-dashed border-gray-300"
+                className="flex items-center gap-2 bg-brand-obsidian rounded-xl px-3 py-2 border border-dashed border-brand-border"
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400 text-xs">+</span>
+                <div className="w-8 h-8 rounded-lg bg-brand-charcoal border border-brand-border flex items-center justify-center">
+                  <span className="text-brand-text/40 text-xs">+</span>
                 </div>
-                <span className="text-sm text-gray-400">Add product</span>
+                <span className="text-sm text-brand-text/50">Add product</span>
               </div>
             ))}
           </div>
@@ -67,7 +53,7 @@ export default function CompareBar() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={clear}
-              className="text-sm text-gray-500 hover:text-red-500 font-medium transition-colors px-3 py-2"
+              className="text-sm text-brand-text/50 hover:text-red-400 font-medium transition-colors px-3 py-2"
             >
               Clear
             </button>
@@ -76,8 +62,8 @@ export default function CompareBar() {
               className={cn(
                 "flex items-center gap-2 font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-300",
                 items.length >= 2
-                  ? "bg-brand-primary hover:bg-brand-dark text-white hover:shadow-teal-glow"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none"
+                  ? "bg-gold hover:bg-gold-600 text-brand-dark hover:shadow-gold-glow"
+                  : "bg-brand-obsidian text-brand-text/40 cursor-not-allowed pointer-events-none border border-brand-border"
               )}
             >
               <GitCompare size={16} />

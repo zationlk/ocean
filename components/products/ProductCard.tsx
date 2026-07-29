@@ -35,8 +35,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
 
+  const isBathware = !product.category?.startsWith("led-");
+  const brandName = isBathware ? "OCEANA" : "OCEAN Lighting Solutions";
   const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}". Could you please provide more details?`
+    `Hello! I'm interested in the "${product.name}" from ${brandName}. Could you please provide more details?`
   );
 
   const shortDesc =
@@ -84,9 +86,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-brand-border overflow-hidden product-card hover:border-brand-primary">
+    <div className="group bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden product-card hover:border-gold/50 hover:shadow-gold-glow">
       {/* Image */}
-      <div className="relative h-52 overflow-hidden bg-gray-50">
+      <div className="relative h-56 overflow-hidden bg-brand-obsidian">
         <img
           src={displayImage}
           alt={product.name}
@@ -95,14 +97,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         />
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {badge && (
-            <span className="bg-brand-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span className="bg-brand-primary text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
               {badge}
             </span>
           )}
           {isNew && !badge && (
-            <span className="bg-teal-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span className="bg-gold text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
               New
             </span>
           )}
@@ -112,10 +114,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           onClick={handleWishlist}
           className={cn(
-            "absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm",
+            "absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm z-10",
             inWishlist
               ? "bg-red-500 text-white"
-              : "bg-white/90 hover:bg-red-50 text-gray-400 hover:text-red-500"
+              : "bg-brand-charcoal/80 hover:bg-brand-charcoal text-white/70 hover:text-red-500 border border-brand-border"
           )}
           aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -130,12 +132,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={handleCompare}
           title={compareItems.length >= 3 && !inCompare ? "Max 3 products" : inCompare ? "Remove from compare" : "Add to compare"}
           className={cn(
-            "absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm opacity-0 group-hover:opacity-100",
+            "absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm z-10 opacity-0 group-hover:opacity-100",
             inCompare
-              ? "bg-brand-primary text-white"
+              ? "bg-gold text-brand-dark"
               : compareItems.length >= 3
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-white/90 hover:bg-teal-50 text-gray-400 hover:text-brand-primary"
+              ? "bg-brand-obsidian text-white/30 cursor-not-allowed border border-brand-border"
+              : "bg-brand-charcoal/80 hover:bg-brand-charcoal text-white/70 hover:text-gold border border-brand-border"
           )}
           aria-label="Compare"
         >
@@ -143,19 +145,19 @@ export default function ProductCard({ product }: ProductCardProps) {
         </button>
 
         {/* Hover overlay with actions */}
-        <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+        <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-0">
           <Link
             href={`/products/${product.slug}`}
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-colors shadow-lg"
+            className="w-10 h-10 bg-brand-charcoal/90 rounded-full flex items-center justify-center hover:bg-gold hover:text-brand-dark border border-brand-border/50 transition-colors shadow-lg"
             aria-label="View product"
           >
-            <Eye size={16} className="text-gray-700" />
+            <Eye size={16} className="text-white hover:text-brand-dark" />
           </Link>
           <a
             href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors shadow-lg"
+            className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors shadow-lg"
             aria-label="Inquire on WhatsApp"
           >
             <MessageCircle size={16} className="text-white" />
@@ -166,23 +168,23 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Content */}
       <div className="p-5">
         {/* Category */}
-        <div className="text-xs text-brand-primary font-semibold uppercase tracking-wider mb-2">
+        <div className="text-[10px] text-gold font-bold uppercase tracking-widest mb-2">
           {product.category?.replace(/-/g, " ")}
         </div>
 
         {/* Name */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-primary transition-colors">
+        <h3 className="font-display font-semibold text-white mb-2 line-clamp-2 group-hover:text-gold transition-colors leading-snug">
           <Link href={`/products/${product.slug}`}>{product.name}</Link>
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-brand-text line-clamp-2 mb-4">{shortDesc}</p>
+        <p className="text-xs text-brand-text font-light line-clamp-2 mb-4 leading-relaxed">{shortDesc}</p>
 
         {/* Actions */}
         <div className="flex gap-2">
           <Link
             href={`/products/${product.slug}`}
-            className="flex-1 text-center bg-teal-50 hover:bg-brand-primary text-brand-primary hover:text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-300"
+            className="flex-1 text-center bg-gold/10 hover:bg-gold text-gold hover:text-brand-dark text-xs font-bold py-2.5 rounded-lg transition-all duration-300 uppercase tracking-wider border border-gold/10"
           >
             View Details
           </Link>
@@ -190,7 +192,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-10 h-10 bg-green-50 hover:bg-green-500 rounded-lg flex items-center justify-center transition-colors group/wa"
+            className="w-10 h-10 bg-green-500/10 hover:bg-green-500 rounded-lg flex items-center justify-center transition-colors group/wa border border-green-500/10"
             aria-label="Inquire on WhatsApp"
           >
             <svg

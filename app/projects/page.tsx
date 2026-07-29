@@ -1,152 +1,119 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, MapPin, Building2, Lightbulb, CheckCircle } from "lucide-react";
+import { ArrowRight, MapPin, Building2, Sparkles, CheckCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Explore our completed lighting projects across Sri Lanka — hotels, residences, offices, and outdoor spaces transformed by Ocean Lighting Solutions.",
+    "Explore our completed lighting and bathware projects across Sri Lanka — hotels, residences, offices, and outdoor spaces transformed by OCEAN Lighting Solutions.",
 };
 
 const projects = [
   {
     id: "proj-1",
-    title: "Serenity Beach Resort – Full Lighting Renovation",
+    title: "Serenity Beach Resort – Full Lighting & Bathware Renovation",
     category: "Hospitality",
     location: "Negombo, Sri Lanka",
     description:
-      "A complete lighting overhaul of a 5-star beachfront resort. We supplied and installed over 800 LED fixtures covering lobby chandeliers, room lighting, restaurant ambiance, pool lighting, and exterior facade illumination.",
+      "A complete lighting and sanitary overhaul of a 5-star beachfront resort. We imported, supplied, and installed 800+ LED fixtures and 140 luxury thermostatic rain shower columns, custom bidet suites, and facade illumination.",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
     highlights: [
-      "800+ LED fixtures installed",
-      "60% energy reduction achieved",
-      "3-day installation timeline",
-      "Custom chandelier design",
+      "800+ LED fixtures and 140 bath suites",
+      "60% energy and water savings achieved",
+      "Custom guest room brassware and crystal lighting",
+      "Successful 5-star standard rating compliance",
     ],
-    tags: ["Commercial", "LED", "Interior", "Outdoor"],
+    tags: ["Commercial", "LED", "Rain Showers", "Bespoke Bathware"],
     year: "2024",
   },
   {
     id: "proj-2",
-    title: "Luxe Interiors – Modern Office Complex",
+    title: "Luxe Corporate HQ – Intelligent Workspace",
     category: "Commercial",
     location: "Colombo, Sri Lanka",
     description:
-      "Design and supply of a full LED panel lighting system for a 6-floor office complex. The project focused on energy efficiency, uniform light distribution, and a clean modern aesthetic that boosts productivity.",
-    image: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=900&q=80",
+      "Design and supply of a full LED panel lighting system and touchless smart sanitary restroom solutions for a 6-floor office complex. The project integrated motion downlights and anti-fog LED mirror cabinets.",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80",
     highlights: [
-      "Complete 6-floor LED panel system",
-      "Smart dimming controls",
-      "CRI >90 for accurate colour rendering",
-      "Annual savings of Rs. 2.4M in electricity",
+      "Full office recessed LED panel systems",
+      "Touchless sensor sanitaryware installations",
+      "CRI >90 for high accuracy color rendering",
+      "Significant annual savings in electrical costs",
     ],
-    tags: ["Commercial", "LED Panels", "Smart Lighting"],
+    tags: ["Commercial", "LED Downlights", "Smart Toilet", "Restrooms"],
     year: "2024",
   },
   {
     id: "proj-3",
-    title: "Residential Villa – Luxury Interior Design",
+    title: "Mountain-View Villa – Luxury Home Suite",
     category: "Residential",
     location: "Kandy, Sri Lanka",
     description:
-      "Bespoke interior lighting design for a luxury private villa. The project featured crystal chandeliers, recessed LED downlights, warm accent lighting, and a smart control system allowing full scene customisation.",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&q=80",
+      "Bespoke interior lighting design and custom bathroom design for a luxury private villa. The project featured crystal chandeliers, freestanding acrylic bathtubs, brushed gold showers, and smart control setups.",
+    image: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=900&q=80",
     highlights: [
-      "Custom crystal chandelier installation",
-      "Smart lighting scenes via app",
-      "12 unique lighting zones",
-      "Premium brass & glass fixtures",
+      "Custom crystal chandelier and gold accents",
+      "Lucite sanitary freestanding acrylic tub",
+      "Brushed Gold thermostatic shower mixers",
+      "Seamless app-controlled lighting scenes",
     ],
-    tags: ["Residential", "Interior", "Smart", "Premium"],
+    tags: ["Residential", "Interior Design", "Bathtubs", "Showers"],
     year: "2023",
   },
   {
     id: "proj-4",
-    title: "Sakura Gardens – Landscape Lighting",
+    title: "Sakura Botanical Gardens – Landscape Lightscapes",
     category: "Outdoor",
     location: "Galle, Sri Lanka",
     description:
-      "A comprehensive outdoor landscape lighting project for a private botanical garden. Solar garden spikes, LED path lights, colour-changing underwater pond lights, and high-powered flood lights were deployed.",
+      "A comprehensive landscape lighting project for a private botanical garden. Deploying monocrystalline solar garden spikes, LED path lights, underwater pond illumination, and commercial flood lights.",
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80",
     highlights: [
-      "100% solar-powered garden lights",
-      "IP66-rated weatherproof fixtures",
-      "Underwater LED pond lighting",
-      "Automated dusk-to-dawn control",
+      "100% grid-free solar path installations",
+      "IP66-rated robust weatherproof housings",
+      "High-power LED spotlight highlighting trees",
+      "Automated dusk-to-dawn sensor switches",
     ],
-    tags: ["Outdoor", "Solar", "Landscape"],
+    tags: ["Outdoor", "Solar Spikes", "Landscape Lights"],
     year: "2023",
-  },
-  {
-    id: "proj-5",
-    title: "Café Umber – Restaurant Ambiance",
-    category: "Food & Beverage",
-    location: "Negombo, Sri Lanka",
-    description:
-      "Warm, inviting ambiance lighting design for a boutique café. The solution combined Nordic pendant lights, warm LED strip underlighting, and dimmer-controlled spots to create an Instagram-worthy dining atmosphere.",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
-    highlights: [
-      "Nordic pendant light feature wall",
-      "Dimmable warm-white system",
-      "LED strip bar underlighting",
-      "Custom track lighting over counter",
-    ],
-    tags: ["F&B", "Interior", "Ambient"],
-    year: "2023",
-  },
-  {
-    id: "proj-6",
-    title: "NTC Industrial Warehouse – High Bay LED",
-    category: "Industrial",
-    location: "Katunayake, Sri Lanka",
-    description:
-      "Installation of 150W industrial high bay LED fixtures across a 20,000 sqft warehouse. The upgrade replaced old metal halide fixtures, dramatically improving light levels while cutting energy costs in half.",
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=900&q=80",
-    highlights: [
-      "120 high bay LEDs installed",
-      "50% energy cost reduction",
-      "Instant-start, no warm-up time",
-      "IP65-rated for dusty environment",
-    ],
-    tags: ["Industrial", "LED", "Energy Saving"],
-    year: "2024",
   },
 ];
 
 const categoryColors: Record<string, string> = {
-  Hospitality: "bg-purple-100 text-purple-700",
-  Commercial: "bg-blue-100 text-blue-700",
-  Residential: "bg-amber-100 text-amber-700",
-  Outdoor: "bg-green-100 text-green-700",
-  "Food & Beverage": "bg-orange-100 text-orange-700",
-  Industrial: "bg-gray-100 text-gray-700",
+  Hospitality: "bg-purple-50 text-purple-700 border border-purple-100",
+  Commercial: "bg-blue-50 text-blue-700 border border-blue-100",
+  Residential: "bg-amber-50 text-amber-700 border border-amber-100",
+  Outdoor: "bg-green-50 text-green-700 border border-green-100",
 };
 
 export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-brand-bg">
       {/* Hero */}
-      <div className="bg-hero-gradient text-white py-20">
-        <div className="container-custom">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4 text-sm">
-            <Building2 size={14} />
-            Our Projects
+      <div className="bg-hero-gradient text-white py-20 relative overflow-hidden border-b border-gold/10">
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gold blur-3xl rounded-full" />
+        </div>
+        <div className="container-custom relative z-10">
+          <div className="inline-flex items-center gap-2 bg-gold/15 border border-gold/30 rounded-full px-4.5 py-1.5 mb-4 text-xs font-bold tracking-widest text-gold uppercase">
+            <Building2 size={12} className="text-gold" />
+            Our Portfolio
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4 max-w-2xl">
-            Real Projects, Real Results
+          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4 tracking-wide max-w-2xl">
+            Exquisite Design, Absolute Quality
           </h1>
-          <p className="text-teal-200 max-w-xl text-lg leading-relaxed">
-            From luxury hotels to industrial warehouses, we&apos;ve transformed hundreds of spaces across Sri Lanka with premium lighting solutions.
+          <p className="text-gray-300 max-w-xl text-base md:text-lg font-light leading-relaxed">
+            From high-profile boutique hotels to private penthouses, explore how OCEAN Lighting Solutions transforms architectural spaces across Sri Lanka.
           </p>
           <div className="flex flex-wrap gap-8 mt-10">
             {[
-              { value: "200+", label: "Projects Completed" },
-              { value: "60%", label: "Avg. Energy Savings" },
-              { value: "10+", label: "Industries Served" },
+              { value: "200+", label: "Completed Projects" },
+              { value: "50%", label: "Average Water & Energy Savings" },
+              { value: "12+", label: "Design Awards" },
             ].map((s) => (
               <div key={s.label}>
-                <div className="font-display text-3xl font-bold text-teal-300">{s.value}</div>
-                <div className="text-teal-200 text-sm mt-0.5">{s.label}</div>
+                <div className="font-display text-3xl font-bold text-gold">{s.value}</div>
+                <div className="text-gray-400 text-xs tracking-wider uppercase mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -159,49 +126,49 @@ export default function ProjectsPage() {
           {projects.map((project, index) => (
             <div
               key={project.id}
-              className={`bg-white rounded-2xl border border-brand-border overflow-hidden hover:border-brand-primary hover:shadow-card-hover transition-all duration-300 group ${
+              className={`bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden hover:border-gold/30 hover:shadow-card-hover transition-all duration-300 group ${
                 index === 0 ? "lg:col-span-2" : ""
               }`}
             >
-              <div className={`relative overflow-hidden ${index === 0 ? "h-80" : "h-56"}`}>
+              <div className={`relative overflow-hidden ${index === 0 ? "h-80" : "h-64"}`}>
                 <img
                   src={project.image}
                   alt={project.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                   <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                    className={`text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full ${
                       categoryColors[project.category] || "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {project.category}
                   </span>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/10 text-white backdrop-blur-sm">
+                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm">
                     {project.year}
                   </span>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-white text-sm">
-                  <MapPin size={14} className="text-teal-300" />
+                  <MapPin size={14} className="text-gold" />
                   {project.location}
                 </div>
               </div>
 
               <div className={`p-6 ${index === 0 ? "grid md:grid-cols-2 gap-8" : ""}`}>
                 <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-primary transition-colors">
+                  <h2 className="font-display text-xl font-bold text-white mb-3 group-hover:text-gold transition-colors tracking-wide">
                     {project.title}
                   </h2>
-                  <p className="text-brand-text text-sm leading-relaxed mb-4">
+                  <p className="text-brand-text text-sm leading-relaxed mb-4 font-light">
                     {project.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs bg-teal-50 text-brand-primary font-medium px-2.5 py-1 rounded-full"
+                        className="text-xs bg-gold-50 text-gold-700 font-semibold px-3 py-1 rounded-full uppercase tracking-wider"
                       >
                         {tag}
                       </span>
@@ -210,14 +177,14 @@ export default function ProjectsPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-sm mb-3 flex items-center gap-2">
-                    <Lightbulb size={16} className="text-brand-primary" />
+                  <h3 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                    <Sparkles size={16} className="text-gold" />
                     Project Highlights
                   </h3>
                   <ul className="space-y-2">
                     {project.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2 text-sm text-brand-text">
-                        <CheckCircle size={14} className="text-brand-primary mt-0.5 shrink-0" />
+                      <li key={h} className="flex items-start gap-2 text-sm text-brand-text font-light">
+                        <CheckCircle size={14} className="text-gold mt-0.5 shrink-0" />
                         {h}
                       </li>
                     ))}
@@ -229,26 +196,26 @@ export default function ProjectsPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 bg-teal-gradient rounded-2xl p-10 text-white text-center">
-          <h2 className="font-display text-3xl font-bold mb-3">
-            Have a Project in Mind?
+        <div className="mt-16 bg-gold-gradient rounded-2xl p-10 text-brand-dark text-center border border-gold/10">
+          <h2 className="font-display text-3xl font-bold mb-3 tracking-wide">
+            Have a Bespoke Project in Mind?
           </h2>
-          <p className="text-teal-200 mb-8 max-w-lg mx-auto">
-            Whether it&apos;s a single room or an entire building, our team will design the perfect lighting solution for you.
+          <p className="text-brand-dark/85 mb-8 max-w-lg mx-auto font-light text-sm">
+            Whether it is planning lighting grids for a custom home build or procuring elite bath fittings for hotel villas, let us collaborate.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="flex items-center gap-2 bg-white text-brand-primary font-semibold px-8 py-4 rounded-xl hover:bg-teal-50 transition-colors"
+              className="flex items-center gap-2 bg-brand-dark text-white hover:bg-black font-bold px-8 py-4 rounded-xl transition-colors shadow-md"
             >
-              Start Your Project
+              Start Consultation
               <ArrowRight size={18} />
             </Link>
             <Link
               href="/products"
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-4 rounded-xl transition-colors"
+              className="flex items-center gap-2 bg-transparent hover:bg-brand-dark/10 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all border border-brand-dark/25"
             >
-              Browse Products
+              Browse Catalog
             </Link>
           </div>
         </div>

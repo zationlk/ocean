@@ -92,7 +92,7 @@ export default function GalleryPage() {
           <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
             Our Projects & Installations
           </h1>
-          <p className="text-teal-200 max-w-xl">
+          <p className="text-gray-300 max-w-xl font-light">
             Browse our portfolio of completed lighting projects across Sri Lanka.
           </p>
         </div>
@@ -108,8 +108,8 @@ export default function GalleryPage() {
               className={cn(
                 "px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200",
                 activeCategory === cat
-                  ? "bg-brand-primary text-white shadow-teal-glow"
-                  : "bg-white text-brand-text border border-brand-border hover:border-brand-primary hover:text-brand-primary"
+                  ? "bg-brand-primary text-brand-dark font-bold shadow-gold-glow"
+                  : "bg-brand-charcoal text-brand-text border border-brand-border hover:border-gold/40 hover:text-gold"
               )}
             >
               {cat}
@@ -127,7 +127,7 @@ export default function GalleryPage() {
           {filtered.map((item, idx) => (
             <div
               key={item.id}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden cursor-pointer bg-white border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300"
+              className="break-inside-avoid group relative rounded-2xl overflow-hidden cursor-pointer bg-brand-charcoal border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300"
               onClick={() => setLightboxIndex(idx)}
             >
               <div className={cn("relative overflow-hidden", heights[idx % heights.length])}>
@@ -149,7 +149,7 @@ export default function GalleryPage() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                <h3 className="font-semibold text-white mb-1">{item.title}</h3>
                 {item.description && (
                   <p className="text-sm text-brand-text">{item.description}</p>
                 )}
@@ -163,7 +163,7 @@ export default function GalleryPage() {
           <p className="text-brand-text mb-4">Want to see full project case studies?</p>
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-dark text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-teal-glow"
+            className="inline-flex items-center gap-2 bg-brand-primary hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow"
           >
             View Case Studies
           </Link>
@@ -203,7 +203,7 @@ export default function GalleryPage() {
               {lightboxItem.description && (
                 <p className="text-gray-400 text-sm mt-1">{lightboxItem.description}</p>
               )}
-              <p className="text-teal-400 text-xs mt-1">
+              <p className="text-gold/70 text-xs mt-1">
                 {lightboxIndex! + 1} / {filtered.length}
               </p>
             </div>

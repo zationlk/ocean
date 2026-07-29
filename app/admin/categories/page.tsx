@@ -6,6 +6,8 @@ import { categories as initialCategories } from "@/lib/data";
 import { Category } from "@/lib/types";
 import toast from "react-hot-toast";
 
+const inputClass = "w-full px-4 py-2.5 bg-brand-obsidian text-white border border-brand-border rounded-xl text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all placeholder:text-brand-text/30";
+
 export default function AdminCategoriesPage() {
   const [cats, setCats] = useState<Category[]>(initialCategories);
   const [showForm, setShowForm] = useState(false);
@@ -22,11 +24,9 @@ export default function AdminCategoriesPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      setCats((prev) =>
-        prev.map((c) =>
-          c.id === editingId ? { ...c, ...formData, slug: formData.name.toLowerCase().replace(/\s+/g, "-") } : c
-        )
-      );
+      setCats((prev) => prev.map((c) =>
+        c.id === editingId ? { ...c, ...formData, slug: formData.name.toLowerCase().replace(/\s+/g, "-") } : c
+      ));
       toast.success("Category updated");
     } else {
       const newCat: Category = {
@@ -49,67 +49,41 @@ export default function AdminCategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-bold text-gray-900">Categories</h2>
+          <h2 className="font-display text-2xl font-bold text-white">Categories</h2>
           <p className="text-brand-text text-sm">{cats.length} categories</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ name: "", description: "", icon: "" }); }}
-          className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-2.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-brand-dark font-bold px-5 py-2.5 rounded-xl transition-colors"
         >
-          <Plus size={18} />
-          Add Category
+          <Plus size={18} /> Add Category
         </button>
       </div>
 
-      {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-brand-primary p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">
-            {editingId ? "Edit Category" : "New Category"}
-          </h3>
+        <div className="bg-brand-charcoal rounded-2xl border border-gold/30 p-6">
+          <h3 className="font-semibold text-white mb-4">{editingId ? "Edit Category" : "New Category"}</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Name *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                  required
-                  placeholder="Category name"
-                  className="w-full px-4 py-2.5 border border-brand-border rounded-xl text-sm outline-none focus:border-brand-primary transition-all"
-                />
+                <label className="block text-xs font-semibold text-brand-text/70 uppercase tracking-wider mb-2">Name *</label>
+                <input type="text" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} required placeholder="Category name" className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Icon (emoji)</label>
-                <input
-                  type="text"
-                  value={formData.icon}
-                  onChange={(e) => setFormData((p) => ({ ...p, icon: e.target.value }))}
-                  placeholder="e.g. 💡"
-                  className="w-full px-4 py-2.5 border border-brand-border rounded-xl text-sm outline-none focus:border-brand-primary transition-all"
-                />
+                <label className="block text-xs font-semibold text-brand-text/70 uppercase tracking-wider mb-2">Icon (emoji)</label>
+                <input type="text" value={formData.icon} onChange={(e) => setFormData((p) => ({ ...p, icon: e.target.value }))} placeholder="e.g. 💡" className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
-                  placeholder="Short description"
-                  className="w-full px-4 py-2.5 border border-brand-border rounded-xl text-sm outline-none focus:border-brand-primary transition-all"
-                />
+                <label className="block text-xs font-semibold text-brand-text/70 uppercase tracking-wider mb-2">Description</label>
+                <input type="text" value={formData.description} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} placeholder="Short description" className={inputClass} />
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+              <button type="submit" className="bg-gold hover:bg-gold-600 text-brand-dark font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
                 {editingId ? "Update" : "Create"} Category
               </button>
-              <button
-                type="button"
-                onClick={() => { setShowForm(false); setEditingId(null); }}
-                className="border border-brand-border text-brand-text hover:border-brand-primary font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
-              >
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); }}
+                className="border border-brand-border text-brand-text hover:border-gold/40 hover:text-gold font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
                 Cancel
               </button>
             </div>
@@ -117,36 +91,29 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {/* Categories grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {cats.map((cat) => (
-          <div key={cat.id} className="bg-white rounded-2xl border border-brand-border overflow-hidden hover:border-brand-primary hover:shadow-card transition-all duration-300">
+          <div key={cat.id} className="bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden hover:border-gold/30 hover:shadow-card transition-all duration-300">
             <div className="h-32 overflow-hidden relative">
               <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-brand-dark/40" />
+              <div className="absolute inset-0 bg-brand-dark/60" />
               <div className="absolute top-3 left-3 text-2xl">{cat.icon}</div>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-1">{cat.name}</h3>
-              <p className="text-sm text-brand-text mb-4">{cat.description}</p>
+              <h3 className="font-semibold text-white mb-1">{cat.name}</h3>
+              <p className="text-sm text-brand-text mb-4 font-light">{cat.description}</p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => {
-                    setEditingId(cat.id);
-                    setFormData({ name: cat.name, description: cat.description, icon: cat.icon });
-                    setShowForm(true);
-                  }}
-                  className="flex items-center gap-1.5 text-xs text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
+                  onClick={() => { setEditingId(cat.id); setFormData({ name: cat.name, description: cat.description, icon: cat.icon }); setShowForm(true); }}
+                  className="flex items-center gap-1.5 text-xs text-gold/70 hover:text-gold hover:bg-gold/10 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-gold/20"
                 >
-                  <Edit size={12} />
-                  Edit
+                  <Edit size={12} /> Edit
                 </button>
                 <button
                   onClick={() => handleDelete(cat.id, cat.name)}
-                  className="flex items-center gap-1.5 text-xs text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
                 >
-                  <Trash2 size={12} />
-                  Delete
+                  <Trash2 size={12} /> Delete
                 </button>
               </div>
             </div>

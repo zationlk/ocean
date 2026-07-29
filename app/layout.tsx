@@ -12,43 +12,44 @@ import { CompareProvider } from "@/context/CompareContext"
 
 export const metadata: Metadata = {
   title: {
-    default: "Ocean Lighting Solutions – Premium LED Lighting in Negombo, Sri Lanka",
-    template: "%s | Ocean Lighting Solutions",
+    default: "OCEAN Lighting Solutions – Premium LED Lighting & OCEANA Luxury Bathware",
+    template: "%s | OCEAN Lighting Solutions",
   },
   description: siteSettings.metaDescription,
   keywords: [
     "LED lighting Sri Lanka",
-    "lighting solutions Negombo",
-    "indoor lighting",
-    "outdoor lighting",
-    "electrical items",
-    "interior solutions",
-    "Ocean Lighting",
+    "bathware Negombo",
+    "luxury sanitaryware",
+    "designer showers Sri Lanka",
+    "indoor lighting Negombo",
+    "outdoor lighting Sri Lanka",
+    "OCEAN Lighting Solutions Negombo",
+    "OCEANA Bathware",
     "LED lights",
-    "chandelier",
-    "flood lights",
+    "freestanding bathtubs",
+    "smart toilet",
   ],
-  authors: [{ name: "Ocean Lighting Solutions" }],
-  creator: "Ocean Lighting Solutions",
+  authors: [{ name: "OCEAN Lighting Solutions" }],
+  creator: "OCEAN Lighting Solutions",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://www.oceanlighting.lk",
-    siteName: "Ocean Lighting Solutions",
-    title: "Ocean Lighting Solutions – Premium LED Lighting in Sri Lanka",
+    siteName: "OCEAN Lighting Solutions",
+    title: "OCEAN Lighting Solutions – Premium LED Lighting & OCEANA Luxury Bathware",
     description: siteSettings.metaDescription,
     images: [
       {
         url: "https://www.oceanlighting.lk/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Ocean Lighting Solutions",
+        alt: "OCEAN Lighting Solutions & OCEANA Bathware",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ocean Lighting Solutions",
+    title: "OCEAN Lighting Solutions",
     description: siteSettings.metaDescription,
     images: ["https://www.oceanlighting.lk/og-image.jpg"],
   },
@@ -62,7 +63,6 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
-  themeColor: "#006060",
 }
 
 export default function RootLayout({
@@ -86,9 +86,12 @@ export default function RootLayout({
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: "#006060",
-                  color: "#fff",
-                  borderRadius: "8px",
+                  background: "#D4AF37",
+                  color: "#0F0F11",
+                  borderRadius: "12px",
+                  fontWeight: "bold",
+                  fontSize: "13px",
+                  border: "1px solid rgba(15,15,17,0.1)",
                 },
               }}
             />

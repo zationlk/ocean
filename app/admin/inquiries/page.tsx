@@ -101,7 +101,7 @@ export default function InquiriesPage() {
   if (loading) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-16 text-center">
-        <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-gray-500 mt-3 text-sm">Loading inquiries…</p>
       </div>
     );
@@ -172,8 +172,8 @@ export default function InquiriesPage() {
                 className={cn(
                   "w-full text-left bg-white rounded-xl border p-4 transition-all duration-200",
                   selected === inquiry.id
-                    ? "border-teal-500 shadow-md ring-1 ring-teal-500/20"
-                    : "border-gray-200 hover:border-teal-300",
+                    ? "border-gold shadow-md ring-1 ring-gold/20"
+                    : "border-gray-200 hover:border-gold/40",
                   inquiry.status === "unread" && "border-l-4 border-l-red-500"
                 )}
               >
@@ -190,7 +190,7 @@ export default function InquiriesPage() {
                     {inquiry.status}
                   </span>
                 </div>
-                <div className="text-xs text-teal-600 font-medium mb-1.5 capitalize">
+                <div className="text-xs text-gold-700 font-medium mb-1.5 capitalize">
                   {inquiry.subject.replace(/-/g, " ")}
                 </div>
                 <p className="text-xs text-gray-500 line-clamp-2">{inquiry.message}</p>
@@ -259,17 +259,17 @@ export default function InquiriesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <a
                     href={`mailto:${selectedInquiry.email}`}
-                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-teal-600 transition-colors bg-gray-50 rounded-xl px-3 py-2.5"
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gold transition-colors bg-gray-50 rounded-xl px-3 py-2.5"
                   >
-                    <Mail size={14} className="text-teal-600 shrink-0" />
+                    <Mail size={14} className="text-gold shrink-0" />
                     <span className="truncate">{selectedInquiry.email}</span>
                   </a>
                   {selectedInquiry.phone && (
                     <a
                       href={`tel:${selectedInquiry.phone}`}
-                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-teal-600 transition-colors bg-gray-50 rounded-xl px-3 py-2.5"
+                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-gold transition-colors bg-gray-50 rounded-xl px-3 py-2.5"
                     >
-                      <Phone size={14} className="text-teal-600 shrink-0" />
+                      <Phone size={14} className="text-gold shrink-0" />
                       <span className="truncate">{selectedInquiry.phone}</span>
                     </a>
                   )}
@@ -284,7 +284,7 @@ export default function InquiriesPage() {
                     {selectedInquiry.subject.replace(/-/g, " ")}
                   </p>
                   {selectedInquiry.product_name && (
-                    <p className="text-xs text-teal-600 mt-0.5">
+                    <p className="text-xs text-gold mt-0.5">
                       Product: {selectedInquiry.product_name}
                     </p>
                   )}

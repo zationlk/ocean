@@ -1,112 +1,78 @@
 import { Metadata } from "next";
-import { Shield, Award, Users, Zap, Target, Eye, Heart } from "lucide-react";
+import { Shield, Award, Users, Zap, Target, Eye, Heart, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description:
-    "Learn about Ocean Lighting Solutions – Sri Lanka's trusted importer and dealer of premium LED lighting and electrical solutions.",
+  description: "Learn about OCEAN Lighting Solutions – Sri Lanka's trusted importer of premium LED lighting and exclusive OCEANA luxury bathware solutions.",
 };
 
 const values = [
-  {
-    icon: Shield,
-    title: "Quality First",
-    description: "We never compromise on quality. Every product we carry meets strict international standards.",
-  },
-  {
-    icon: Heart,
-    title: "Customer Focus",
-    description: "Our customers are at the heart of everything we do. Your satisfaction is our success.",
-  },
-  {
-    icon: Zap,
-    title: "Innovation",
-    description: "We stay ahead of lighting technology trends to bring you the latest and most efficient solutions.",
-  },
-  {
-    icon: Users,
-    title: "Community",
-    description: "We're proud to serve and contribute to the communities across Sri Lanka.",
-  },
+  { icon: Shield, title: "Quality First", description: "We never compromise. Every imported fixture and ceramic suite meets strict international standards." },
+  { icon: Heart, title: "Bespoke Service", description: "Our customers are at the heart of our craft. Custom design consultancies guarantee satisfaction." },
+  { icon: Zap, title: "Sleek Innovation", description: "We track global design trends to deliver smart toilets, anti-fog mirrors, and CCT changeable LEDs." },
+  { icon: Users, title: "Island-Wide Prestige", description: "We are proud to furnish landmark luxury resorts and fine residential properties across Sri Lanka." },
 ];
 
-const team = [
-  {
-    name: "Managing Director",
-    role: "Leadership & Vision",
-    description: "Leading Ocean Lighting Solutions with a passion for quality and customer service.",
-  },
-  {
-    name: "Technical Expert",
-    role: "Product Specialist",
-    description: "Ensuring every product meets our high standards and customer requirements.",
-  },
-  {
-    name: "Sales Team",
-    role: "Customer Relations",
-    description: "Dedicated to helping customers find the perfect lighting solutions.",
-  },
+const stats = [
+  { value: "10+", label: "Years in Business" },
+  { value: "500+", label: "Masterpiece Collections" },
+  { value: "1000+", label: "Premium Projects" },
+  { value: "50+", label: "Global Brand Partners" },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-brand-obsidian">
       {/* Hero */}
-      <div className="bg-hero-gradient text-white py-20">
-        <div className="container-custom">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4 text-sm">
-            About Us
+      <div className="bg-hero-gradient text-white py-20 relative overflow-hidden border-b border-gold/10">
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-gold blur-3xl rounded-full" />
+        </div>
+        <div className="container-custom relative z-10">
+          <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-2 mb-4 text-xs font-bold tracking-widest text-gold uppercase">
+            <Sparkles size={12} />
+            Our Story
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4 max-w-2xl">
-            Illuminating Sri Lanka Since Day One
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-wide max-w-2xl leading-tight">
+            Redefining Light &amp; Water Since Day One
           </h1>
-          <p className="text-teal-200 max-w-2xl text-lg">
-            Ocean Lighting Solutions is your trusted partner for premium LED lighting, electrical items, and interior solutions in Sri Lanka.
+          <p className="text-brand-text max-w-2xl text-base font-light leading-relaxed">
+            OCEAN Lighting Solutions is Sri Lanka&apos;s premier dealer of high-end LED lighting and exclusive OCEANA designer bathware collections.
           </p>
         </div>
       </div>
 
-      {/* Story section */}
-      <section className="section-padding bg-white">
+      {/* Story */}
+      <section className="section-padding bg-brand-charcoal">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-teal-50 text-brand-primary text-sm font-semibold px-4 py-2 rounded-full mb-4">
-                Our Story
+              <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-gold/20">
+                <Sparkles size={12} /> Our Heritage
               </div>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                A Passion for Premium Lighting
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-6 tracking-wide">
+                A Passion for Elite Living Spaces
               </h2>
-              <div className="section-divider mb-6" />
-              <div className="space-y-4 text-brand-text leading-relaxed">
-                <p>
-                  Ocean Lighting Solutions was founded with a simple mission: to bring world-class lighting solutions to Sri Lanka at accessible prices. Located in the heart of Negombo, we have grown to become one of the most trusted names in the lighting industry.
-                </p>
-                <p>
-                  We import directly from leading manufacturers worldwide, ensuring our customers receive genuine, high-quality products with full warranty support. Our showroom at 591, Chilaw Road, Kattuwa, Negombo showcases hundreds of products across all categories.
-                </p>
-                <p>
-                  From residential homes to luxury hotels, commercial offices to industrial facilities — we have the expertise and product range to illuminate any space beautifully and efficiently.
-                </p>
+              <div className="w-16 h-px bg-gold mb-6" />
+              <div className="space-y-5 text-brand-text leading-relaxed font-light text-sm md:text-base">
+                <p>OCEAN Lighting Solutions was established with a singular vision: to bring world-class, premium architectural lighting and luxury designer bathware to Sri Lanka. Headquartered in Negombo, we have evolved into a distinguished destination for architects, interior designers, and discerning homeowners.</p>
+                <p>By importing directly from top-tier international manufacturers, we guarantee authentic, high-performance fixtures with comprehensive warranty support. Our showroom at 591, Chilaw Road, Kattuwa, Negombo houses display zones designed to inspire custom layouts.</p>
+                <p>Whether illuminating a boutique ocean-front villa or supplying OCEANA smart sanitaryware for premium high-rise suites, our expertise and curated collections bring your concepts to life.</p>
               </div>
             </div>
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden shadow-card-hover">
-                <img
-                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=80"
-                  alt="Our Showroom"
-                  className="w-full h-[450px] object-cover"
-                />
+              <div className="rounded-3xl overflow-hidden border border-brand-border">
+                <img src="https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=700&q=80" alt="OCEAN Showroom" className="w-full h-[450px] object-cover" />
               </div>
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card p-5">
+              <div className="absolute -bottom-6 -left-6 bg-brand-obsidian rounded-2xl border border-brand-border p-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-teal-gradient rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gold-gradient rounded-xl flex items-center justify-center">
                     <Award size={22} className="text-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900 text-xl">10+ Years</div>
-                    <div className="text-sm text-brand-text">Serving Sri Lanka</div>
+                    <div className="font-bold text-white text-xl">10+ Years</div>
+                    <div className="text-xs text-brand-text">Serving Sri Lanka</div>
                   </div>
                 </div>
               </div>
@@ -116,54 +82,50 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="section-padding bg-brand-bg">
+      <section className="section-padding bg-brand-obsidian">
         <div className="container-custom">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-gold/20">
+              <Sparkles size={12} /> Our Purpose
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">Mission &amp; Vision</h2>
+            <div className="w-16 h-px bg-gold mx-auto" />
+          </div>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl p-8 border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300">
-              <div className="w-12 h-12 bg-teal-gradient rounded-xl flex items-center justify-center mb-5">
-                <Target size={22} className="text-white" />
+            {[
+              { icon: Target, title: "Our Mission", text: "To provide Sri Lanka with premium, energy-efficient LED lighting and designer OCEANA bathware solutions. We are dedicated to delivering unmatched durability, high aesthetic value, and professional consulting support for custom home builds." },
+              { icon: Eye, title: "Our Vision", text: "To be the foremost luxury LED lighting and OCEANA designer bathware destination in South Asia, recognized for our commitment to green technology, premium product design, and absolute customer loyalty." },
+            ].map((item) => (
+              <div key={item.title} className="bg-brand-charcoal rounded-2xl p-8 border border-brand-border hover:border-gold/30 hover:shadow-card-hover transition-all duration-300 group">
+                <div className="w-12 h-12 bg-gold-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <item.icon size={22} className="text-white" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-white mb-4 tracking-wide">{item.title}</h3>
+                <p className="text-brand-text leading-relaxed font-light text-sm">{item.text}</p>
               </div>
-              <h3 className="font-display text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
-              <p className="text-brand-text leading-relaxed">
-                To provide Sri Lanka with access to premium, energy-efficient lighting solutions that enhance living and working environments while delivering exceptional value and service. We are committed to making quality lighting accessible to every home and business.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300">
-              <div className="w-12 h-12 bg-teal-gradient rounded-xl flex items-center justify-center mb-5">
-                <Eye size={22} className="text-white" />
-              </div>
-              <h3 className="font-display text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
-              <p className="text-brand-text leading-relaxed">
-                To be Sri Lanka&apos;s most trusted and innovative lighting solutions provider, recognized for our commitment to quality, sustainability, and customer satisfaction. We envision a future where every space in Sri Lanka is beautifully and efficiently illuminated.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-brand-charcoal">
         <div className="container-custom">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-teal-50 text-brand-primary text-sm font-semibold px-4 py-2 rounded-full mb-4">
-              Our Values
+            <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-gold/20">
+              <Sparkles size={12} /> Core Pillars
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What Drives Us
-            </h2>
-            <div className="section-divider mx-auto" />
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">What Drives Our Team</h2>
+            <div className="w-16 h-px bg-gold mx-auto" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value) => (
-              <div
-                key={value.title}
-                className="text-center p-6 bg-brand-bg rounded-2xl border border-brand-border hover:border-brand-primary hover:shadow-card transition-all duration-300 group"
-              >
-                <div className="w-14 h-14 bg-teal-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <div key={value.title} className="text-center p-6 bg-brand-obsidian rounded-2xl border border-brand-border hover:border-gold/30 hover:shadow-card transition-all duration-300 group">
+                <div className="w-14 h-14 bg-gold-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <value.icon size={24} className="text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{value.title}</h3>
-                <p className="text-sm text-brand-text leading-relaxed">{value.description}</p>
+                <h3 className="font-semibold text-white mb-2">{value.title}</h3>
+                <p className="text-xs text-brand-text font-light leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
@@ -171,18 +133,13 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-teal-gradient">
+      <section className="py-16 bg-gold-gradient border-y border-gold/10">
         <div className="container-custom">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-white text-center">
-            {[
-              { value: "10+", label: "Years in Business" },
-              { value: "500+", label: "Products Available" },
-              { value: "1000+", label: "Happy Customers" },
-              { value: "50+", label: "Premium Brands" },
-            ].map((stat) => (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            {stats.map((stat) => (
               <div key={stat.label}>
-                <div className="font-display text-4xl md:text-5xl font-bold mb-2 glow-text">{stat.value}</div>
-                <div className="text-teal-200 font-medium">{stat.label}</div>
+                <div className="font-display text-4xl md:text-5xl font-bold mb-2 text-brand-dark">{stat.value}</div>
+                <div className="text-brand-dark/75 font-semibold text-xs tracking-wider uppercase">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -190,26 +147,18 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-brand-obsidian border-t border-brand-border">
         <div className="container-custom text-center">
-          <h2 className="font-display text-3xl font-bold text-gray-900 mb-4">
-            Visit Our Showroom
-          </h2>
-          <p className="text-brand-text max-w-xl mx-auto mb-8">
-            Experience our full product range in person. Our team is ready to help you find the perfect lighting solution.
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4 tracking-wide">Visit Our Negombo Showroom</h2>
+          <p className="text-brand-text max-w-xl mx-auto mb-8 font-light leading-relaxed text-sm">
+            Experience our complete collections of luxury indoor chandeliers, smart OCEANA bathroom cabinets, and rainfall shower modules in person.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/contact"
-              className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-teal-glow"
-            >
+            <Link href="/contact" className="bg-gold hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow">
               Get in Touch
             </Link>
-            <Link
-              href="/products"
-              className="border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300"
-            >
-              Browse Products
+            <Link href="/products" className="border-2 border-gold/50 text-gold hover:bg-gold hover:text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300">
+              Browse Catalog
             </Link>
           </div>
         </div>

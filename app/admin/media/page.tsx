@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Trash2, Copy, Check } from "lucide-react";
+import { Upload, Trash2, Copy, Check, Image } from "lucide-react";
 import toast from "react-hot-toast";
 
 const sampleImages = [
@@ -34,7 +34,6 @@ export default function AdminMediaPage() {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    // In a real app, upload to storage
     toast.success(`${files.length} file(s) uploaded successfully`);
   };
 
@@ -42,68 +41,67 @@ export default function AdminMediaPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-bold text-gray-900">Media Library</h2>
+          <h2 className="font-display text-2xl font-bold text-white">Media Library</h2>
           <p className="text-brand-text text-sm">{images.length} images</p>
         </div>
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-2.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-brand-dark font-bold px-5 py-2.5 rounded-xl transition-colors"
         >
-          <Upload size={18} />
-          Upload Images
+          <Upload size={18} /> Upload Images
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleUpload}
-          className="hidden"
-        />
+        <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleUpload} className="hidden" />
       </div>
 
       {/* Upload zone */}
       <div
-        className="border-2 border-dashed border-brand-border rounded-2xl p-10 text-center hover:border-brand-primary transition-colors cursor-pointer"
+        className="border-2 border-dashed border-brand-border rounded-2xl p-10 text-center hover:border-gold/40 transition-colors cursor-pointer bg-brand-charcoal"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Upload size={32} className="mx-auto mb-3 text-gray-300" />
+        <Upload size={32} className="mx-auto mb-3 text-brand-text/30" />
         <p className="text-brand-text font-medium">Click to upload or drag and drop</p>
-        <p className="text-sm text-gray-400 mt-1">PNG, JPG, WebP up to 10MB</p>
+        <p className="text-sm text-brand-text/50 mt-1">PNG, JPG, WebP up to 10MB</p>
       </div>
 
       {/* Images grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {images.map((img) => (
-          <div key={img.id} className="group relative bg-white rounded-xl border border-brand-border overflow-hidden hover:border-brand-primary hover:shadow-card transition-all duration-300">
+          <div key={img.id} className="group relative bg-brand-charcoal rounded-xl border border-brand-border overflow-hidden hover:border-gold/30 hover:shadow-card transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
             </div>
-            <div className="p-2">
+            <div className="p-2 border-t border-brand-border">
               <p className="text-xs text-brand-text truncate">{img.name}</p>
             </div>
-            <div className="absolute inset-0 bg-brand-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-brand-dark/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <button
                 onClick={() => handleCopy(img.url, img.id)}
-                className="p-2 bg-white rounded-lg hover:bg-teal-50 transition-colors"
+                className="p-2 bg-brand-charcoal border border-brand-border rounded-lg hover:border-gold/40 transition-colors"
                 title="Copy URL"
               >
-                {copiedId === img.id ? (
-                  <Check size={14} className="text-green-600" />
-                ) : (
-                  <Copy size={14} className="text-brand-primary" />
-                )}
+                {copiedId === img.id
+                  ? <Check size={14} className="text-green-400" />
+                  : <Copy size={14} className="text-gold" />}
               </button>
               <button
                 onClick={() => handleDelete(img.id)}
-                className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors"
+                className="p-2 bg-brand-charcoal border border-brand-border rounded-lg hover:border-red-500/40 transition-colors"
                 title="Delete"
               >
-                <Trash2 size={14} className="text-red-500" />
+                <Trash2 size={14} className="text-red-400" />
               </button>
             </div>
           </div>
         ))}
+
+        {/* Empty upload slot */}
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="aspect-square bg-brand-charcoal rounded-xl border-2 border-dashed border-brand-border hover:border-gold/40 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+        >
+          <Image size={24} className="text-brand-text/30" />
+          <span className="text-xs text-brand-text/40">Add Image</span>
+        </div>
       </div>
     </div>
   );

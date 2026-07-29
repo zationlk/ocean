@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, Clock, Zap, Facebook, Instagram } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Sparkles, Facebook, Instagram } from "lucide-react";
 import { siteSettings } from "@/lib/data";
 
 export default function Footer() {
@@ -11,18 +11,20 @@ export default function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 bg-teal-gradient rounded-xl flex items-center justify-center">
-                <Zap size={20} className="text-white" />
+              <div className="w-10 h-10 bg-gold-gradient rounded-xl flex items-center justify-center">
+                <Sparkles size={20} className="text-white" />
               </div>
               <div>
-                <div className="font-display font-bold text-lg leading-tight">
-                  Ocean Lighting
+                <div className="font-display font-bold text-xl tracking-wider text-white leading-none">
+                  OCEAN
                 </div>
-                <div className="text-xs text-teal-300 font-medium">Solutions</div>
+                <div className="text-[9px] text-gold font-semibold tracking-wider uppercase leading-none mt-1">
+                  Lighting Solutions
+                </div>
               </div>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Sri Lanka&apos;s trusted importer and dealer of premium LED lighting, electrical items, and interior solutions.
+              Sri Lanka&apos;s premier brand for high-end LED lighting, designer sanitaryware, and luxury bathware solutions.
             </p>
             <div className="flex gap-3">
               {siteSettings.socialMedia?.facebook && (
@@ -80,9 +82,9 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-teal-300 text-sm transition-colors flex items-center gap-2"
+                    className="text-gray-400 hover:text-gold text-sm transition-colors flex items-center gap-2"
                   >
-                    <span className="w-1 h-1 bg-teal-500 rounded-full"></span>
+                    <span className="w-1 h-1 bg-gold rounded-full"></span>
                     {link.label}
                   </Link>
                 </li>
@@ -93,22 +95,23 @@ export default function Footer() {
           {/* Products */}
           <div>
             <h3 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">
-              Products
+              Collections
             </h3>
             <ul className="space-y-3">
               {[
-                { href: "/products?category=led-lighting", label: "LED Lighting" },
-                { href: "/products?category=indoor-lighting", label: "Indoor Lighting" },
-                { href: "/products?category=outdoor-lighting", label: "Outdoor Lighting" },
-                { href: "/products?category=electrical-items", label: "Electrical Items" },
-                { href: "/products?category=interior-solutions", label: "Interior Solutions" },
+                { href: "/products?category=led-indoor-lighting", label: "LED Indoor Lighting" },
+                { href: "/products?category=led-outdoor-lighting", label: "LED Outdoor Lighting" },
+                { href: "/products?category=luxury-sanitaryware", label: "Luxury Sanitaryware" },
+                { href: "/products?category=designer-showers-faucets", label: "Showers & Faucets" },
+                { href: "/products?category=premium-bathtubs", label: "Bathtubs & Jacuzzis" },
+                { href: "/products?category=bathroom-accessories", label: "Smart Mirrors & Accessories" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-teal-300 text-sm transition-colors flex items-center gap-2"
+                    className="text-gray-400 hover:text-gold text-sm transition-colors flex items-center gap-2"
                   >
-                    <span className="w-1 h-1 bg-teal-500 rounded-full"></span>
+                    <span className="w-1 h-1 bg-gold rounded-full"></span>
                     {link.label}
                   </Link>
                 </li>
@@ -123,7 +126,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-4">
               <li className="flex gap-3">
-                <MapPin size={16} className="text-teal-400 mt-0.5 shrink-0" />
+                <MapPin size={16} className="text-gold mt-0.5 shrink-0" />
                 <span className="text-gray-400 text-sm leading-relaxed">
                   {siteSettings.address}
                 </span>
@@ -131,9 +134,9 @@ export default function Footer() {
               <li>
                 <a
                   href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
-                  className="flex gap-3 text-gray-400 hover:text-teal-300 text-sm transition-colors"
+                  className="flex gap-3 text-gray-400 hover:text-gold text-sm transition-colors"
                 >
-                  <Phone size={16} className="text-teal-400 shrink-0" />
+                  <Phone size={16} className="text-gold shrink-0" />
                   <div>
                     <div>{siteSettings.telephone}</div>
                     <div>{siteSettings.mobile}</div>
@@ -143,15 +146,15 @@ export default function Footer() {
               <li>
                 <a
                   href={`mailto:${siteSettings.email}`}
-                  className="flex gap-3 text-gray-400 hover:text-teal-300 text-sm transition-colors"
+                  className="flex gap-3 text-gray-400 hover:text-gold text-sm transition-colors"
                 >
-                  <Mail size={16} className="text-teal-400 shrink-0" />
+                  <Mail size={16} className="text-gold shrink-0" />
                   {siteSettings.email}
                 </a>
               </li>
               
               <li className="flex gap-3">
-                <Clock size={16} className="text-teal-400 mt-0.5 shrink-0" />
+                <Clock size={16} className="text-gold mt-0.5 shrink-0" />
                 <div className="text-gray-400 text-sm space-y-1">
                   <div>{siteSettings.businessHours.weekdays}</div>
                   <div>{siteSettings.businessHours.saturday}</div>
@@ -164,16 +167,16 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10">
+      <div className="border-t border-white/5">
         <div className="container-custom py-5 flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Ocean Lighting Solutions. All rights reserved.
+            © {new Date().getFullYear()} OCEAN Lighting Solutions. All rights reserved. Bathware powered by OCEANA.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy-policy" className="text-gray-500 hover:text-teal-300 text-sm transition-colors">
+            <Link href="/privacy-policy" className="text-gray-500 hover:text-gold text-sm transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-gray-500 hover:text-teal-300 text-sm transition-colors">
+            <Link href="/terms" className="text-gray-500 hover:text-gold text-sm transition-colors">
               Terms of Service
             </Link>
           </div>
@@ -182,3 +185,4 @@ export default function Footer() {
     </footer>
   );
 }
+
