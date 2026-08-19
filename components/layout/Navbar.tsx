@@ -14,20 +14,39 @@ const navLinks = [
   { href: "/", label: "Home" },
   {
     href: "/products",
-    label: "Products",
+    label: "Lighting",
     children: [
-      { href: "/products?category=led-indoor-lighting", label: "LED Indoor Lighting" },
-      { href: "/products?category=led-outdoor-lighting", label: "LED Outdoor Lighting" },
-      { href: "/products?category=luxury-sanitaryware", label: "Luxury Sanitaryware" },
-      { href: "/products?category=designer-showers-faucets", label: "Designer Showers & Faucets" },
-      { href: "/products?category=premium-bathtubs", label: "Premium Bathtubs & Jacuzzis" },
-      { href: "/products?category=bathroom-accessories", label: "Smart Mirrors & Accessories" },
+      { href: "/products?category=indoor-lighting",    label: "Indoor Lighting" },
+      { href: "/products?category=outdoor-lighting",   label: "Outdoor Lighting" },
+      { href: "/products?category=commercial-lighting",label: "Commercial Lighting" },
+      { href: "/products?category=led-bulbs",          label: "LED Bulbs" },
+      { href: "/products?category=led-tube-lights",    label: "LED Tube Lights" },
+      { href: "/products?category=led-ceiling-lights", label: "LED Ceiling Lights" },
+      { href: "/products?category=led-strip-lighting", label: "LED Strip Lighting" },
+      { href: "/products?category=led-mirror-lights",  label: "LED Mirror Lights" },
+      { href: "/products?category=led-step-lights",    label: "LED Step Lights" },
+      { href: "/products?category=electrical-items",   label: "Electrical Items" },
+    ],
+  },
+  {
+    href: "/products",
+    label: "Bathware",
+    children: [
+      { href: "/products?category=toilets",               label: "Toilets (WC)" },
+      { href: "/products?category=wash-basins",           label: "Wash Basins" },
+      { href: "/products?category=faucets-mixers",        label: "Faucets & Mixers" },
+      { href: "/products?category=showers",               label: "Showers" },
+      { href: "/products?category=bathroom-accessories",  label: "Bathroom Accessories" },
+      { href: "/products?category=bathroom-mirrors",      label: "Bathroom Mirrors" },
+      { href: "/products?category=vanity-units",          label: "Vanity Units" },
+      { href: "/products?category=kitchen-sinks-faucets", label: "Kitchen Sinks & Faucets" },
+      { href: "/products?category=plumbing-accessories",  label: "Plumbing Accessories" },
     ],
   },
   { href: "/projects", label: "Projects" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/gallery",  label: "Gallery" },
+  { href: "/about",    label: "About" },
+  { href: "/contact",  label: "Contact" },
 ];
 
 export default function Navbar() {
@@ -148,7 +167,7 @@ export default function Navbar() {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="block px-4 py-3 text-sm text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors border-b border-brand-border last:border-0"
+                          className="block px-4 py-2.5 text-sm text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors border-b border-brand-border last:border-0"
                         >
                           {child.label}
                         </Link>
@@ -210,7 +229,7 @@ export default function Navbar() {
               </a>
               <Link
                 href="/contact"
-                className="bg-brand-primary hover:bg-gold-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all duration-300 hover:shadow-gold-glow"
+                className="bg-gold hover:bg-gold-600 text-brand-dark text-sm font-bold px-4 py-2.5 rounded-lg transition-all duration-300 hover:shadow-gold-glow"
               >
                 Get Quote
               </Link>

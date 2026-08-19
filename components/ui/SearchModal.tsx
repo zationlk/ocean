@@ -90,7 +90,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="p-5">
               <p className="text-xs font-semibold text-brand-text/50 uppercase tracking-wider mb-3">Popular Searches</p>
               <div className="flex flex-wrap gap-2">
-                {["LED Panel", "Chandelier", "Rain Shower", "Bathtub", "Track Light", "Smart Mirror"].map((s) => (
+                {["LED Bulbs", "Indoor Lighting", "Flood Light", "Toilet", "Basin Faucet", "Rain Shower", "Mirror Light", "Vanity Unit"].map((s) => (
                   <button
                     key={s}
                     onClick={() => setQuery(s)}
