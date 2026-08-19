@@ -106,29 +106,15 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-[72px] gap-4">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              {/* PNG logo if available, otherwise text fallback */}
-              <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-gold-gradient flex items-center justify-center shadow-gold-glow group-hover:shadow-gold-glow-lg transition-all duration-300">
-                <Image
-                  src="/logo.png"
-                  alt="Ocean Lighting Solutions"
-                  width={36}
-                  height={36}
-                  className="object-contain"
-                  onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                  priority
-                />
-                {/* Fallback text if no logo */}
-                <span className="font-display font-bold text-white text-sm absolute select-none" aria-hidden="true">O</span>
-              </div>
-              <div className="hidden sm:block">
-                <div className="font-display font-bold text-base md:text-lg tracking-wider text-white group-hover:text-gold transition-colors leading-none">
-                  Ocean Lighting
-                </div>
-                <div className="text-[9px] text-gold/80 font-semibold tracking-[0.15em] uppercase leading-none mt-0.5">
-                  Solutions
-                </div>
-              </div>
+            <Link href="/" className="flex items-center shrink-0 group">
+              <Image
+                src="/logo.png"
+                alt="Ocean Lighting Solutions"
+                width={160}
+                height={52}
+                className="h-10 md:h-12 w-auto object-contain group-hover:opacity-90 transition-opacity"
+                priority
+              />
             </Link>
 
             {/* Desktop nav */}

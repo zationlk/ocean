@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, Clock, Sparkles, Facebook, Instagram } from "lucide-react";
+import Image from "next/image";
+import { MapPin, Phone, Mail, Clock, Facebook, Instagram } from "lucide-react";
 import { siteSettings } from "@/lib/data";
 
 export default function Footer() {
@@ -10,18 +11,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-8 lg:gap-10">
           {/* Brand column */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 bg-gold-gradient rounded-xl flex items-center justify-center">
-                <Sparkles size={20} className="text-white" />
-              </div>
-              <div>
-                <div className="font-display font-bold text-xl tracking-wider text-white leading-none">
-                  OCEAN
-                </div>
-                <div className="text-[9px] text-gold font-semibold tracking-wider uppercase leading-none mt-1">
-                  Lighting Solutions
-                </div>
-              </div>
+            <Link href="/" className="inline-flex mb-5 group">
+              <Image
+                src="/logo.png"
+                alt="Ocean Lighting Solutions"
+                width={180}
+                height={60}
+                className="h-12 w-auto object-contain group-hover:opacity-90 transition-opacity"
+              />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               Sri Lanka&apos;s premier brand for high-end LED lighting, designer sanitaryware, and luxury bathware solutions.
