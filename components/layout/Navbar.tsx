@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Menu, X, Phone, ChevronDown, Heart, GitCompare, Search,
-  Lightbulb, Droplets, Home, FolderImage, Building2, Info, Mail,
+  Lightbulb, Droplets, Home, Images, Building2, Info, Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteSettings } from "@/lib/data";
@@ -201,7 +201,7 @@ export default function Navbar() {
 
               {[
                 { href: "/projects", label: "Projects",  Icon: Building2 },
-                { href: "/gallery",  label: "Gallery",   Icon: FolderImage },
+                { href: "/gallery",  label: "Gallery",   Icon: Images },
                 { href: "/about",    label: "About",     Icon: Info },
                 { href: "/contact",  label: "Contact",   Icon: Mail },
               ].map(({ href, label, Icon }) => (
@@ -320,7 +320,7 @@ export default function Navbar() {
 
               {[
                 { href: "/projects", label: "Projects",  Icon: Building2 },
-                { href: "/gallery",  label: "Gallery",   Icon: FolderImage },
+                { href: "/gallery",  label: "Gallery",   Icon: Images },
                 { href: "/about",    label: "About",     Icon: Info },
                 { href: "/contact",  label: "Contact",   Icon: Mail },
               ].map(({ href, label, Icon }) => (
