@@ -4,21 +4,22 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description: "Learn about OCEAN Lighting Solutions – Sri Lanka's trusted importer of premium LED lighting and exclusive OCEANA luxury bathware solutions.",
+  description:
+    "Learn about Ocean Lighting Solutions – Sri Lanka's trusted supplier of premium LED lighting, electrical items, and quality bathware in Negombo.",
 };
 
 const values = [
-  { icon: Shield, title: "Quality First", description: "We never compromise. Every imported fixture and ceramic suite meets strict international standards." },
-  { icon: Heart, title: "Bespoke Service", description: "Our customers are at the heart of our craft. Custom design consultancies guarantee satisfaction." },
-  { icon: Zap, title: "Sleek Innovation", description: "We track global design trends to deliver smart toilets, anti-fog mirrors, and CCT changeable LEDs." },
-  { icon: Users, title: "Island-Wide Prestige", description: "We are proud to furnish landmark luxury resorts and fine residential properties across Sri Lanka." },
+  { icon: Shield, title: "Quality First",        description: "Every product we carry meets strict quality standards — from LED fittings to bathroom ceramics." },
+  { icon: Heart, title: "Customer Focus",         description: "Your satisfaction drives us. Our team provides personalised guidance for every project, big or small." },
+  { icon: Zap,   title: "Innovation",             description: "We keep pace with global trends — smart lighting, anti-fog mirrors, water-saving faucets and more." },
+  { icon: Users, title: "Island-Wide Service",    description: "We proudly serve homes, hotels and commercial spaces across Sri Lanka with reliable delivery." },
 ];
 
 const stats = [
-  { value: "10+", label: "Years in Business" },
-  { value: "500+", label: "Masterpiece Collections" },
-  { value: "1000+", label: "Premium Projects" },
-  { value: "50+", label: "Global Brand Partners" },
+  { value: "10+",   label: "Years in Business" },
+  { value: "34+",   label: "Products in Catalogue" },
+  { value: "1000+", label: "Happy Customers" },
+  { value: "19",    label: "Product Categories" },
 ];
 
 export default function AboutPage() {
@@ -31,14 +32,13 @@ export default function AboutPage() {
         </div>
         <div className="container-custom relative z-10">
           <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-2 mb-4 text-xs font-bold tracking-widest text-gold uppercase">
-            <Sparkles size={12} />
-            Our Story
+            <Sparkles size={12} /> Our Story
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-wide max-w-2xl leading-tight">
-            Redefining Light &amp; Water Since Day One
+            Lighting &amp; Bathware Excellence Since Day One
           </h1>
           <p className="text-brand-text max-w-2xl text-base font-light leading-relaxed">
-            OCEAN Lighting Solutions is Sri Lanka&apos;s premier dealer of high-end LED lighting and exclusive OCEANA designer bathware collections.
+            Ocean Lighting Solutions is Sri Lanka&apos;s trusted destination for premium LED lighting, electrical items, and quality bathware — all from our showroom in Negombo.
           </p>
         </div>
       </div>
@@ -52,18 +52,28 @@ export default function AboutPage() {
                 <Sparkles size={12} /> Our Heritage
               </div>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-6 tracking-wide">
-                A Passion for Elite Living Spaces
+                A Passion for Quality Spaces
               </h2>
               <div className="w-16 h-px bg-gold mb-6" />
               <div className="space-y-5 text-brand-text leading-relaxed font-light text-sm md:text-base">
-                <p>OCEAN Lighting Solutions was established with a singular vision: to bring world-class, premium architectural lighting and luxury designer bathware to Sri Lanka. Headquartered in Negombo, we have evolved into a distinguished destination for architects, interior designers, and discerning homeowners.</p>
-                <p>By importing directly from top-tier international manufacturers, we guarantee authentic, high-performance fixtures with comprehensive warranty support. Our showroom at 591, Chilaw Road, Kattuwa, Negombo houses display zones designed to inspire custom layouts.</p>
-                <p>Whether illuminating a boutique ocean-front villa or supplying OCEANA smart sanitaryware for premium high-rise suites, our expertise and curated collections bring your concepts to life.</p>
+                <p>
+                  Ocean Lighting Solutions was founded with a clear mission — to bring quality LED lighting, electrical products, and bathware to Sri Lanka at accessible prices. Based in Negombo, we have grown into a trusted destination for homeowners, interior designers, architects, and commercial clients.
+                </p>
+                <p>
+                  We import directly from reliable international manufacturers and local distributors, ensuring every product is genuine, high-performing, and backed by warranty support. Our showroom at 591, Chilaw Road, Kattuwa, Negombo showcases our full range across 19 product categories.
+                </p>
+                <p>
+                  Whether you are fitting out a new home, renovating a hotel, or upgrading a commercial space — our experienced team will help you choose the right products at the right price.
+                </p>
               </div>
             </div>
             <div className="relative">
               <div className="rounded-3xl overflow-hidden border border-brand-border">
-                <img src="https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=700&q=80" alt="OCEAN Showroom" className="w-full h-[450px] object-cover" />
+                <img
+                  src="https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=700&q=80"
+                  alt="Ocean Lighting Solutions Showroom"
+                  className="w-full h-[450px] object-cover"
+                />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-brand-obsidian rounded-2xl border border-brand-border p-5">
                 <div className="flex items-center gap-3">
@@ -88,13 +98,23 @@ export default function AboutPage() {
             <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-gold/20">
               <Sparkles size={12} /> Our Purpose
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">Mission &amp; Vision</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">
+              Mission &amp; Vision
+            </h2>
             <div className="w-16 h-px bg-gold mx-auto" />
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { icon: Target, title: "Our Mission", text: "To provide Sri Lanka with premium, energy-efficient LED lighting and designer OCEANA bathware solutions. We are dedicated to delivering unmatched durability, high aesthetic value, and professional consulting support for custom home builds." },
-              { icon: Eye, title: "Our Vision", text: "To be the foremost luxury LED lighting and OCEANA designer bathware destination in South Asia, recognized for our commitment to green technology, premium product design, and absolute customer loyalty." },
+              {
+                icon: Target,
+                title: "Our Mission",
+                text: "To provide Sri Lanka with reliable, energy-efficient LED lighting, quality electrical items, and premium bathware solutions. We are committed to delivering great value, strong product performance, and genuine customer support for every project.",
+              },
+              {
+                icon: Eye,
+                title: "Our Vision",
+                text: "To be Sri Lanka's most trusted supplier of LED lighting and bathware — recognised for consistent product quality, fair pricing, and outstanding service from our showroom in Negombo to customers across the island.",
+              },
             ].map((item) => (
               <div key={item.title} className="bg-brand-charcoal rounded-2xl p-8 border border-brand-border hover:border-gold/30 hover:shadow-card-hover transition-all duration-300 group">
                 <div className="w-12 h-12 bg-gold-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -115,7 +135,9 @@ export default function AboutPage() {
             <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-gold/20">
               <Sparkles size={12} /> Core Pillars
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">What Drives Our Team</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 tracking-wide">
+              What Drives Our Team
+            </h2>
             <div className="w-16 h-px bg-gold mx-auto" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -149,16 +171,18 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="section-padding bg-brand-obsidian border-t border-brand-border">
         <div className="container-custom text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4 tracking-wide">Visit Our Negombo Showroom</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4 tracking-wide">
+            Visit Our Negombo Showroom
+          </h2>
           <p className="text-brand-text max-w-xl mx-auto mb-8 font-light leading-relaxed text-sm">
-            Experience our complete collections of luxury indoor chandeliers, smart OCEANA bathroom cabinets, and rainfall shower modules in person.
+            See our complete range of LED lighting, bathware, and electrical items in person. Our team is ready to help.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/contact" className="bg-gold hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow">
               Get in Touch
             </Link>
             <Link href="/products" className="border-2 border-gold/50 text-gold hover:bg-gold hover:text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300">
-              Browse Catalog
+              Browse Catalogue
             </Link>
           </div>
         </div>

@@ -38,10 +38,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
 
-  const isBathware = !product.category?.startsWith("led-");
-  const brandName = isBathware ? "OCEANA" : "OCEAN Lighting Solutions";
   const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}" from ${brandName}. Could you please provide more details?`
+    `Hello! I'm interested in the "${product.name}". Could you please provide more details?`
   );
 
   const shortDesc =

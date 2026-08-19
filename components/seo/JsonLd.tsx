@@ -1,7 +1,5 @@
-import { Metadata } from "next"
-
 interface JsonLdProps {
-  data: Record<string, unknown>
+  data: Record<string, unknown>;
 }
 
 export function JsonLd({ data }: JsonLdProps) {
@@ -10,15 +8,16 @@ export function JsonLd({ data }: JsonLdProps) {
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
-  )
+  );
 }
 
 export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "OCEAN Lighting Solutions",
-    description: "Sri Lanka's premier brand for high-end LED lighting, electrical installations, and luxury OCEANA bathware solutions.",
+    name: "Ocean Lighting Solutions",
+    description:
+      "Sri Lanka's trusted destination for premium LED lighting, electrical items, and bathware. Showroom at 591, Chilaw Road, Kattuwa, Negombo.",
     url: "https://www.oceanlighting.lk",
     logo: "https://www.oceanlighting.lk/logo.png",
     address: {
@@ -38,14 +37,14 @@ export function generateOrganizationSchema() {
       "https://facebook.com/oceanlighting",
       "https://instagram.com/oceanlighting",
     ],
-  }
+  };
 }
 
 export function generateLocalBusinessSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "HomeGoodsStore",
-    name: "OCEAN Lighting Solutions",
+    name: "Ocean Lighting Solutions",
     image: "https://www.oceanlighting.lk/logo.png",
     address: {
       "@type": "PostalAddress",
@@ -74,18 +73,20 @@ export function generateLocalBusinessSchema() {
         closes: "16:00",
       },
     ],
-    priceRange: "$$$",
-  }
+    priceRange: "$$",
+  };
 }
 
-export function generateProductSchema(products: Array<{
-  name: string
-  description: string
-  images: string[]
-  price?: string
-  brand?: string
-  sku?: string
-}>) {
+export function generateProductSchema(
+  products: Array<{
+    name: string;
+    description: string;
+    images: string[];
+    price?: string;
+    brand?: string;
+    sku?: string;
+  }>
+) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -97,7 +98,9 @@ export function generateProductSchema(products: Array<{
         name: product.name,
         description: product.description,
         image: product.images,
-        brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+        brand: product.brand
+          ? { "@type": "Brand", name: product.brand }
+          : undefined,
         sku: product.sku,
         offers: product.price
           ? {
@@ -109,5 +112,5 @@ export function generateProductSchema(products: Array<{
           : undefined,
       },
     })),
-  }
+  };
 }

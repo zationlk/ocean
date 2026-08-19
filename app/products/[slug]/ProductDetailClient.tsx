@@ -47,10 +47,8 @@ export default function ProductDetailClient({ product, related }: Props) {
     return () => document.removeEventListener("keydown", onKey);
   }, [zoomed]);
 
-  const isBathware = !product.category?.startsWith("led-");
-  const brandName = isBathware ? "OCEANA" : "OCEAN Lighting Solutions";
   const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}" from ${brandName}. Could you please provide more details and pricing?`
+    `Hello! I'm interested in the "${product.name}" from Ocean Lighting Solutions. Could you please provide more details and pricing?`
   );
 
   // Recently viewed excluding current

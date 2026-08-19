@@ -104,7 +104,7 @@ export default function WhyChooseUs() {
             </h2>
             <div className="section-divider mb-6" />
             <p className="text-brand-text mb-10 leading-relaxed font-light text-sm md:text-base">
-              OCEAN Lighting Solutions has been transforming living spaces across Sri Lanka with signature imports. We merge state-of-the-art engineering with sophisticated aesthetics to provide fixtures that are built to perform and styled to inspire, featuring the elite OCEANA bathware collections.
+              Ocean Lighting Solutions has been transforming spaces across Sri Lanka with premium LED lighting and quality bathware. We combine performance, design, and value to deliver products that elevate every home, hotel, and commercial space.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

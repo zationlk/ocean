@@ -113,7 +113,7 @@ export default function HeroSection() {
           >
             <img
               src={currentData.image}
-              alt="OCEANA Luxury Visual"
+              alt="Ocean Lighting Solutions"
               className="w-full h-full object-cover"
               loading="eager"
             />
