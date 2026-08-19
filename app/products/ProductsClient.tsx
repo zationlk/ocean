@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, X, Grid, List } from "lucide-react";
+import { Search, X, Grid, List, Package } from "lucide-react";
 import { products as staticProducts, categories as staticCategories } from "@/lib/data";
 import ProductCard from "@/components/products/ProductCard";
 import { cn } from "@/lib/utils";
@@ -55,10 +55,10 @@ export default function ProductsClient() {
             Signature Catalog
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-wide">
-            Our Masterpiece Collections
+            Our Product Collections
           </h1>
           <p className="text-gray-300 max-w-2xl font-light text-sm md:text-base leading-relaxed">
-            Explore our curated ranges of high-efficiency LED lighting solutions and luxury imported designer bathware suites.
+            Browse our complete range of LED lighting, electrical items, and premium bathware — 19 categories, 34+ products.
           </p>
         </div>
       </div>
