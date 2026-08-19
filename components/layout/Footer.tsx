@@ -70,14 +70,15 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {[
-                { href: "/", label: "Home" },
-                { href: "/products", label: "Products" },
+                { href: "/",         label: "Home" },
+                { href: "/lighting", label: "Lighting" },
+                { href: "/bathware", label: "Bathware" },
                 { href: "/projects", label: "Projects" },
-                { href: "/gallery", label: "Gallery" },
-                { href: "/about", label: "About Us" },
-                { href: "/contact", label: "Contact" },
+                { href: "/gallery",  label: "Gallery" },
+                { href: "/about",    label: "About Us" },
+                { href: "/contact",  label: "Contact" },
                 { href: "/wishlist", label: "My Wishlist" },
-                { href: "/faq", label: "FAQ" },
+                { href: "/faq",      label: "FAQ" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -97,16 +98,16 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">Lighting</h3>
             <ul className="space-y-3">
               {[
-                { href: "/products?category=indoor-lighting",    label: "Indoor Lighting" },
-                { href: "/products?category=outdoor-lighting",   label: "Outdoor Lighting" },
-                { href: "/products?category=commercial-lighting",label: "Commercial Lighting" },
-                { href: "/products?category=led-bulbs",          label: "LED Bulbs" },
-                { href: "/products?category=led-tube-lights",    label: "LED Tube Lights" },
-                { href: "/products?category=led-ceiling-lights", label: "LED Ceiling Lights" },
-                { href: "/products?category=led-strip-lighting", label: "LED Strip Lighting" },
-                { href: "/products?category=led-mirror-lights",  label: "LED Mirror Lights" },
-                { href: "/products?category=led-step-lights",    label: "LED Step Lights" },
-                { href: "/products?category=electrical-items",   label: "Electrical Items" },
+                { href: "/lighting",                                label: "All Lighting" },
+                { href: "/lighting?category=indoor-lighting",      label: "Indoor Lighting" },
+                { href: "/lighting?category=outdoor-lighting",     label: "Outdoor Lighting" },
+                { href: "/lighting?category=commercial-lighting",  label: "Commercial Lighting" },
+                { href: "/lighting?category=led-bulbs",            label: "LED Bulbs" },
+                { href: "/lighting?category=led-tube-lights",      label: "LED Tube Lights" },
+                { href: "/lighting?category=led-ceiling-lights",   label: "LED Ceiling Lights" },
+                { href: "/lighting?category=led-strip-lighting",   label: "LED Strip Lighting" },
+                { href: "/lighting?category=led-mirror-lights",    label: "LED Mirror Lights" },
+                { href: "/lighting?category=electrical-items",     label: "Electrical Items" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-gray-400 hover:text-gold text-sm transition-colors flex items-center gap-2">
@@ -123,15 +124,16 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">Bathware</h3>
             <ul className="space-y-3">
               {[
-                { href: "/products?category=toilets",               label: "Toilets (WC)" },
-                { href: "/products?category=wash-basins",           label: "Wash Basins" },
-                { href: "/products?category=faucets-mixers",        label: "Faucets & Mixers" },
-                { href: "/products?category=showers",               label: "Showers" },
-                { href: "/products?category=bathroom-accessories",  label: "Bathroom Accessories" },
-                { href: "/products?category=bathroom-mirrors",      label: "Bathroom Mirrors" },
-                { href: "/products?category=vanity-units",          label: "Vanity Units" },
-                { href: "/products?category=kitchen-sinks-faucets", label: "Kitchen Sinks & Faucets" },
-                { href: "/products?category=plumbing-accessories",  label: "Plumbing Accessories" },
+                { href: "/bathware",                                      label: "All Bathware" },
+                { href: "/bathware?category=toilets",                     label: "Toilets (WC)" },
+                { href: "/bathware?category=wash-basins",                 label: "Wash Basins" },
+                { href: "/bathware?category=faucets-mixers",              label: "Faucets & Mixers" },
+                { href: "/bathware?category=showers",                     label: "Showers" },
+                { href: "/bathware?category=bathroom-accessories",        label: "Bathroom Accessories" },
+                { href: "/bathware?category=bathroom-mirrors",            label: "Bathroom Mirrors" },
+                { href: "/bathware?category=vanity-units",                label: "Vanity Units" },
+                { href: "/bathware?category=kitchen-sinks-faucets",       label: "Kitchen Sinks & Faucets" },
+                { href: "/bathware?category=plumbing-accessories",        label: "Plumbing Accessories" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-gray-400 hover:text-gold text-sm transition-colors flex items-center gap-2">
