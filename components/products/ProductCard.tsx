@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MessageCircle, Heart, GitCompare, Maximize2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { siteSettings } from "@/lib/data";
 import { useWishlist } from "@/context/WishlistContext";
@@ -40,15 +41,14 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const inWishlist = isInWishlist(product.id);
   const inCompare  = isInCompare(product.id);
+  const shortDesc  = product.shortDescription || product.short_description || product.description || "";
+  const displayImage = product.images?.[0] || "/placeholder-product.jpg";
+  const isNew = product.isNew || product.is_new;
+  const badge = product.badge;
 
   const whatsappMessage = encodeURIComponent(
     `Hello! I'm interested in the "${product.name}". Could you please provide more details?`
   );
-
-  const shortDesc    = product.shortDescription || product.short_description || product.description || "";
-  const displayImage = product.images?.[0] || "/placeholder-product.jpg";
-  const isNew        = product.isNew || product.is_new;
-  const badge        = product.badge;
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
@@ -57,121 +57,117 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const handleCompare = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
-    if (inCompare) {
-      removeCompare(product.id);
-    } else if (compareItems.length < 3) {
-      addCompare({ id: product.id, name: product.name, slug: product.slug, image: displayImage, category: product.category, specifications: product.specifications, features: product.features, shortDescription: product.shortDescription || product.short_description });
-    }
-  };
-
-  const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault(); e.stopPropagation();
-    setQuickViewOpen(true);
+    if (inCompare) removeCompare(product.id);
+    else if (compareItems.length < 3) addCompare({ id: product.id, name: product.name, slug: product.slug, image: displayImage, category: product.category, specifications: product.specifications, features: product.features, shortDescription: product.shortDescription || product.short_description });
   };
 
   return (
     <>
-      {/* QuickView rendered via portal into document.body */}
       <QuickView
         product={quickViewOpen ? (product as Parameters<typeof QuickView>[0]["product"]) : null}
         onClose={() => setQuickViewOpen(false)}
       />
 
-      <div className="group bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden product-card hover:border-gold/40 hover:shadow-gold-glow transition-all duration-300">
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className="group relative bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden hover:border-gold/40 transition-colors duration-300"
+        style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+      >
+        {/* Hover glow effect */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{ boxShadow: "inset 0 0 40px rgba(212,175,55,0.06)" }}
+        />
+
         {/* ── Image ── */}
-        <div className="relative h-52 overflow-hidden bg-brand-obsidian">
+        <div className="relative overflow-hidden bg-brand-obsidian" style={{ aspectRatio: "4/3" }}>
           <img
             src={displayImage}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
             loading="lazy"
           />
 
-          {/* Badges */}
+          {/* Gradient overlay always visible at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-obsidian/60 via-transparent to-transparent" />
+
+          {/* Badge */}
           {(badge || isNew) && (
             <div className="absolute top-3 left-3 z-10">
-              {badge ? (
-                <span className="bg-gold text-brand-dark text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                  {badge}
-                </span>
-              ) : (
-                <span className="bg-brand-primary text-brand-dark text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                  New
-                </span>
-              )}
+              <span className={cn(
+                "text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm",
+                badge ? "bg-gold text-brand-dark" : "bg-brand-primary text-brand-dark"
+              )}>
+                {badge || "New"}
+              </span>
             </div>
           )}
 
-          {/* Wishlist */}
-          <button
+          {/* Wishlist top-right */}
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={handleWishlist}
             className={cn(
-              "absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm",
+              "absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md",
               inWishlist
-                ? "bg-red-500 text-white"
-                : "bg-brand-charcoal/80 hover:bg-brand-charcoal text-white/60 hover:text-red-400 border border-brand-border"
+                ? "bg-red-500 text-white border-red-500"
+                : "bg-brand-obsidian/70 backdrop-blur-sm text-white/50 hover:text-red-400 border border-brand-border hover:border-red-400/50"
             )}
             aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart size={13} className={inWishlist ? "fill-white" : ""} />
-          </button>
+          </motion.button>
 
-          {/* Compare (appears on hover) */}
-          <button
+          {/* Compare bottom-right (hover) */}
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={handleCompare}
-            title={compareItems.length >= 3 && !inCompare ? "Max 3 products" : inCompare ? "Remove from compare" : "Add to compare"}
+            title={compareItems.length >= 3 && !inCompare ? "Max 3 products" : inCompare ? "Remove" : "Compare"}
             className={cn(
               "absolute bottom-3 right-3 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-sm opacity-0 group-hover:opacity-100",
-              inCompare
-                ? "bg-gold text-brand-dark"
-                : compareItems.length >= 3
-                ? "bg-brand-obsidian text-white/20 cursor-not-allowed border border-brand-border"
-                : "bg-brand-charcoal/80 hover:bg-brand-charcoal text-white/60 hover:text-gold border border-brand-border"
+              inCompare ? "bg-gold text-brand-dark" : "bg-brand-obsidian/70 backdrop-blur-sm text-white/50 hover:text-gold border border-brand-border"
             )}
-            aria-label="Compare"
           >
-            <GitCompare size={12} />
-          </button>
+            <GitCompare size={11} />
+          </motion.button>
 
-          {/* Hover overlay — Quick View + WhatsApp only, NO eye icon */}
-          <div className="absolute inset-0 bg-brand-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-0">
-            <button
-              onClick={handleQuickView}
-              className="flex items-center gap-1.5 bg-brand-charcoal/90 hover:bg-gold hover:text-brand-dark border border-brand-border/50 text-white text-xs font-semibold px-4 py-2 rounded-full transition-all shadow-lg"
-              title="Quick view"
+          {/* Centre overlay on hover: Quick View */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setQuickViewOpen(true); }}
+              className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md hover:bg-gold hover:text-brand-dark border border-white/20 hover:border-gold text-white text-xs font-bold px-4 py-2 rounded-full transition-all shadow-xl"
             >
-              <Maximize2 size={13} /> Quick View
-            </button>
-            <a
-              href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors shadow-lg"
-              aria-label="Inquire on WhatsApp"
-              onClick={e => e.stopPropagation()}
-            >
-              <MessageCircle size={15} className="text-white" />
-            </a>
+              <Maximize2 size={12} /> Quick View
+            </motion.button>
           </div>
         </div>
 
         {/* ── Content ── */}
         <div className="p-4">
-          <div className="text-[10px] text-gold font-bold uppercase tracking-widest mb-1.5">
+          {/* Category tag */}
+          <div className="text-[9px] text-gold/70 font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+            <span className="w-1 h-1 bg-gold/50 rounded-full inline-block" />
             {product.category?.replace(/-/g, " ")}
           </div>
 
-          <h3 className="font-semibold text-white text-sm mb-1.5 line-clamp-2 group-hover:text-gold transition-colors leading-snug">
+          {/* Name */}
+          <h3 className="font-semibold text-white text-sm mb-1.5 line-clamp-2 group-hover:text-gold transition-colors duration-200 leading-snug">
             <Link href={`/products/${product.slug}`}>{product.name}</Link>
           </h3>
 
-          <p className="text-[11px] text-brand-text font-light line-clamp-2 mb-4 leading-relaxed">{shortDesc}</p>
+          {/* Short description */}
+          <p className="text-[11px] text-brand-text/60 font-light line-clamp-2 mb-4 leading-relaxed">
+            {shortDesc}
+          </p>
 
-          {/* Actions */}
+          {/* Action row */}
           <div className="flex gap-2">
             <Link
               href={`/products/${product.slug}`}
-              className="flex-1 text-center bg-gold/10 hover:bg-gold text-gold hover:text-brand-dark text-xs font-bold py-2.5 rounded-lg transition-all duration-200 border border-gold/15 hover:border-gold hover:shadow-gold-glow"
+              className="flex-1 text-center bg-gold/8 hover:bg-gold text-gold hover:text-brand-dark text-xs font-bold py-2.5 rounded-xl transition-all duration-200 border border-gold/15 hover:border-gold hover:shadow-gold-glow"
             >
               View Details
             </Link>
@@ -179,14 +175,14 @@ export default function ProductCard({ product }: { product: Product }) {
               href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 bg-green-500/10 hover:bg-green-500 rounded-lg flex items-center justify-center transition-colors group/wa border border-green-500/15 hover:border-green-500"
-              aria-label="Inquire on WhatsApp"
+              className="w-10 h-10 bg-green-500/8 hover:bg-green-500 rounded-xl flex items-center justify-center transition-all group/wa border border-green-500/15 hover:border-green-500 hover:shadow-lg"
+              aria-label="WhatsApp inquiry"
             >
               {WA_SVG}
             </a>
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }
