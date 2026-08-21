@@ -81,11 +81,11 @@ export default function ProductCard({ product }: { product: Product }) {
         />
 
         {/* ── Image ── */}
-        <div className="relative overflow-hidden bg-brand-obsidian" style={{ aspectRatio: "4/3" }}>
+        <div className="relative overflow-hidden bg-brand-obsidian h-48 sm:h-52">
           <img
             src={displayImage}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
           />
 
@@ -167,7 +167,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="flex gap-2">
             <Link
               href={`/products/${product.slug}`}
-              className="flex-1 text-center bg-gold/8 hover:bg-gold text-gold hover:text-brand-dark text-xs font-bold py-2.5 rounded-xl transition-all duration-200 border border-gold/15 hover:border-gold hover:shadow-gold-glow"
+              className="flex-1 text-center bg-gold/10 hover:bg-gold text-gold hover:text-brand-dark text-xs font-bold py-2.5 rounded-xl transition-all duration-200 border border-gold/15 hover:border-gold hover:shadow-gold-glow"
             >
               View Details
             </Link>
