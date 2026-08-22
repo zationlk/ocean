@@ -13,7 +13,8 @@ const slides = [
     highlight: "Space",
     titleEnd: " with Style",
     subtitle: "From crystal chandeliers to architectural downlights — premium LED lighting engineered for elegance.",
-    image: "https://images.unsplash.com/photo-1543248939-ff40856f65d4?w=1600&q=90",
+    // ── Replace with your own image: place file at public/hero/slide-1.jpg ──
+    image: "/hero/slide-1.jpg",
     cta: { text: "Explore Lighting", href: "/lighting" },
     accent: "#D4AF37",
     tag: "10+ Years in Sri Lanka",
@@ -24,7 +25,8 @@ const slides = [
     highlight: "Bathroom",
     titleEnd: " Experience",
     subtitle: "Thermostatic rain showers, smart toilets, waterfall faucets — luxury bathware for discerning homes.",
-    image: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=1600&q=90",
+    // ── Replace with your own image: place file at public/hero/slide-2.jpg ──
+    image: "/hero/slide-2.jpg",
     cta: { text: "Explore Bathware", href: "/bathware" },
     accent: "#D4AF37",
     tag: "9 Product Categories",
@@ -35,7 +37,8 @@ const slides = [
     highlight: "Showroom",
     titleEnd: " Today",
     subtitle: "591 Chilaw Road, Kattuwa, Negombo — see our complete range of lighting and bathware in person.",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=90",
+    // ── Replace with your own image: place file at public/hero/slide-3.jpg ──
+    image: "/hero/slide-3.jpg",
     cta: { text: "Get Directions", href: "/contact" },
     accent: "#D4AF37",
     tag: "Mon–Sat Open",
