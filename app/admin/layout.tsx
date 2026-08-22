@@ -1,31 +1,15 @@
 import type { Metadata } from "next";
-import { Toaster } from "react-hot-toast";
 import AdminLayoutClient from "./AdminLayoutClient";
 
 export const metadata: Metadata = {
-  title: "Admin Panel – OCEAN",
+  title: {
+    default: "Admin Panel",
+    template: "%s | Admin – Ocean Lighting",
+  },
 };
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <>
-      <AdminLayoutClient>{children}</AdminLayoutClient>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "#D4AF37",
-            color: "#0F0F11",
-            borderRadius: "12px",
-            fontWeight: "bold",
-          },
-        }}
-      />
-    </>
-  );
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // No Toaster here — admin login has its own, admin pages use the one
+  // provided by AdminLayoutClient for non-login admin routes.
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }

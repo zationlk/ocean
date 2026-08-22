@@ -32,7 +32,7 @@ export default function ComparePage() {
             Add at least 2 products to the compare list by clicking the compare icon on any product card.
           </p>
           <Link
-            href="/products"
+            href="/lighting"
             className="inline-flex items-center gap-2 bg-brand-primary hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow"
           >
             <ArrowLeft size={18} />
@@ -67,7 +67,7 @@ export default function ComparePage() {
       <div className="container-custom py-10">
         <div className="flex items-center justify-between mb-6">
           <Link
-            href="/products"
+            href="/lighting"
             className="inline-flex items-center gap-2 text-brand-text hover:text-brand-primary text-sm transition-colors"
           >
             <ArrowLeft size={16} />

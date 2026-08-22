@@ -48,7 +48,7 @@ export default function FeaturedProducts() {
               Best Sellers
             </h2>
           </div>
-          <Link href="/products" className="inline-flex items-center gap-2 text-gold font-bold text-sm tracking-wider uppercase hover:gap-3 transition-all shrink-0">
+          <Link href="/lighting" className="inline-flex items-center gap-2 text-gold font-bold text-sm tracking-wider uppercase hover:gap-3 transition-all shrink-0">
             Full Catalogue <ArrowRight size={16} />
           </Link>
         </div>

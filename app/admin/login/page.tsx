@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, ArrowRight, Shield } from "lucide-react";
-import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 import { motion } from "framer-motion";
 
@@ -26,9 +25,10 @@ export default function AdminLoginPage() {
     if (formData.email === "admin@oceanlighting.lk" && formData.password === "admin123") {
       document.cookie = "admin_session=authenticated; path=/; max-age=86400";
       toast.success("Welcome back!");
-      router.push("/admin/dashboard");
+      // Small delay so toast renders before navigation
+      setTimeout(() => router.replace("/admin/dashboard"), 800);
     } else {
-      toast.error("Invalid credentials");
+      toast.error("Invalid email or password");
       setIsLoading(false);
     }
   };
@@ -58,12 +58,10 @@ export default function AdminLoginPage() {
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="relative w-full max-w-md"
         >
-          {/* Logo */}
+          {/* Header — text only, no logo */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-5">
-              <div className="relative w-20 h-20 rounded-2xl bg-brand-charcoal border border-gold/20 flex items-center justify-center overflow-hidden shadow-gold-glow">
-                <Image src="/logo.png" alt="Ocean Lighting" width={80} height={80} className="object-contain p-1" />
-              </div>
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 mb-5">
+              <Lock size={24} className="text-gold" />
             </div>
             <h1 className="font-display text-2xl font-bold text-white tracking-wide mb-1">Admin Portal</h1>
             <p className="text-brand-text/50 text-sm font-light">Ocean Lighting Solutions</p>

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { Toaster } from "react-hot-toast";
 
 const navItems = [
   { href: "/admin/dashboard",  label: "Dashboard",  icon: LayoutDashboard, badge: null },
@@ -215,6 +216,22 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
             Ocean Lighting Solutions · Admin Panel · v1.0
           </p>
         </footer>
+
+        {/* Single Toaster for all admin pages (except login which has its own) */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3500,
+            style: {
+              background: "#1A1A1E",
+              color: "#D4AF37",
+              borderRadius: "12px",
+              fontWeight: "600",
+              fontSize: "13px",
+              border: "1px solid rgba(212,175,55,0.2)",
+            },
+          }}
+        />
       </div>
     </div>
   );

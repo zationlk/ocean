@@ -43,7 +43,7 @@ export default function WishlistPage() {
               Browse our products and save the ones you love by clicking the heart icon.
             </p>
             <Link
-              href="/products"
+              href="/lighting"
               className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow"
             >
               <ShoppingBag size={18} />

@@ -21,7 +21,7 @@ export default function NewArrivals() {
             </h2>
             <div className="section-divider" />
           </div>
-          <Link href="/products" className="inline-flex items-center gap-2 text-gold font-bold hover:gap-3 transition-all duration-200 shrink-0 text-sm tracking-wider uppercase">
+          <Link href="/lighting" className="inline-flex items-center gap-2 text-gold font-bold hover:gap-3 transition-all duration-200 shrink-0 text-sm tracking-wider uppercase">
             View All New <ArrowRight size={18} />
           </Link>
         </div>

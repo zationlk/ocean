@@ -181,7 +181,7 @@ export default function AboutPage() {
             <Link href="/contact" className="bg-gold hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow">
               Get in Touch
             </Link>
-            <Link href="/products" className="border-2 border-gold/50 text-gold hover:bg-gold hover:text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300">
+            <Link href="/lighting" className="border-2 border-gold/50 text-gold hover:bg-gold hover:text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300">
               Browse Catalogue
             </Link>
           </div>

@@ -22,7 +22,7 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link
-            href="/products"
+            href="/lighting"
             className="flex items-center gap-2 bg-brand-primary hover:bg-gold-600 text-brand-dark font-bold px-6 py-3 rounded-xl transition-colors"
           >
             Browse Products

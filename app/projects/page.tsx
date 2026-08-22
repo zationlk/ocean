@@ -212,7 +212,7 @@ export default function ProjectsPage() {
               <ArrowRight size={18} />
             </Link>
             <Link
-              href="/products"
+              href="/lighting"
               className="flex items-center gap-2 bg-transparent hover:bg-brand-dark/10 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all border border-brand-dark/25"
             >
               Browse Catalog

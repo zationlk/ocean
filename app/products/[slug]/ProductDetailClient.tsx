@@ -62,9 +62,9 @@ export default function ProductDetailClient({ product, related }: Props) {
           <nav className="flex items-center gap-2 text-xs text-brand-text flex-wrap">
             <Link href="/" className="hover:text-gold transition-colors">Home</Link>
             <ChevronRight size={12} className="text-brand-text/30" />
-            <Link href="/products" className="hover:text-gold transition-colors">Products</Link>
+            <Link href="/lighting" className="hover:text-gold transition-colors">Products</Link>
             <ChevronRight size={12} className="text-brand-text/30" />
-            <Link href={`/products?category=${product.category}`} className="hover:text-gold transition-colors capitalize">
+            <Link href={`/lighting?category=${product.category}`} className="hover:text-gold transition-colors capitalize">
               {product.category.replace(/-/g, " ")}
             </Link>
             <ChevronRight size={12} className="text-brand-text/30" />
@@ -74,7 +74,7 @@ export default function ProductDetailClient({ product, related }: Props) {
       </div>
 
       <div className="container-custom py-8 lg:py-12">
-        <Link href="/products" className="inline-flex items-center gap-2 text-brand-text hover:text-gold text-sm mb-8 transition-colors group">
+        <Link href="/lighting" className="inline-flex items-center gap-2 text-brand-text hover:text-gold text-sm mb-8 transition-colors group">
           <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Products
         </Link>

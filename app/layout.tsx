@@ -1,11 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
-import WhatsAppButton from "@/components/ui/WhatsAppButton"
-import CompareBar from "@/components/ui/CompareBar"
-import BackToTop from "@/components/ui/BackToTop"
-import { Toaster } from "react-hot-toast"
+import LayoutShell from "@/components/layout/LayoutShell"
 import { siteSettings } from "@/lib/data"
 import { WishlistProvider } from "@/context/WishlistContext"
 import { CompareProvider } from "@/context/CompareContext"
@@ -55,16 +50,9 @@ export const metadata: Metadata = {
     description: siteSettings.metaDescription,
     images: ["https://www.oceanlighting.lk/og-image.jpg"],
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: "https://www.oceanlighting.lk",
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: "https://www.oceanlighting.lk" },
+  icons: { icon: "/favicon.ico" },
 }
 
 export default function RootLayout({
@@ -77,26 +65,9 @@ export default function RootLayout({
       <body className="antialiased">
         <WishlistProvider>
           <CompareProvider>
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <WhatsAppButton />
-            <CompareBar />
-            <BackToTop />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: "#D4AF37",
-                  color: "#0F0F11",
-                  borderRadius: "12px",
-                  fontWeight: "bold",
-                  fontSize: "13px",
-                  border: "1px solid rgba(15,15,17,0.1)",
-                },
-              }}
-            />
+            <LayoutShell>
+              {children}
+            </LayoutShell>
           </CompareProvider>
         </WishlistProvider>
       </body>

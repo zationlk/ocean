@@ -15,9 +15,15 @@ function CategoryCard({ category, count, small = false }: {
   count: number;
   small?: boolean;
 }) {
+  // Route lighting slugs to /lighting, bathware slugs to /bathware
+  const isLighting = LIGHTING_SLUGS.includes(category.slug);
+  const href = isLighting
+    ? `/lighting?category=${category.slug}`
+    : `/bathware?category=${category.slug}`;
+
   return (
     <Link
-      href={`/products?category=${category.slug}`}
+      href={href}
       className="group relative overflow-hidden rounded-2xl bg-brand-charcoal border border-brand-border hover:border-gold/50 transition-all duration-300 hover:shadow-gold-glow flex flex-col"
     >
       <div className={`relative overflow-hidden ${small ? "h-32" : "h-40"}`}>
@@ -90,7 +96,7 @@ export default function CategoriesSection() {
                 </h3>
               </div>
               <Link
-                href="/products?category=indoor-lighting"
+                href="/lighting"
                 className="hidden sm:flex items-center gap-1.5 text-xs text-gold font-bold uppercase tracking-wider hover:gap-2.5 transition-all"
               >
                 All Lighting <ArrowRight size={13} />
@@ -113,7 +119,7 @@ export default function CategoriesSection() {
                 </h3>
               </div>
               <Link
-                href="/products?category=toilets"
+                href="/bathware"
                 className="hidden sm:flex items-center gap-1.5 text-xs text-gold font-bold uppercase tracking-wider hover:gap-2.5 transition-all"
               >
                 All Bathware <ArrowRight size={13} />
@@ -130,7 +136,7 @@ export default function CategoriesSection() {
         {/* CTA */}
         <div className="text-center mt-14">
           <Link
-            href="/products"
+            href="/lighting"
             className="inline-flex items-center gap-2 bg-gold hover:bg-gold-600 text-brand-dark font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-gold-glow"
           >
             View Complete Catalog
