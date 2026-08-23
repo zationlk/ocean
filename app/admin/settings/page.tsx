@@ -63,7 +63,7 @@ export default function AdminSettingsPage() {
             {[{ name: "telephone", label: "Telephone" }, { name: "mobile", label: "Mobile" }, { name: "whatsapp", label: "WhatsApp (with country code)" }].map(f => (
               <div key={f.name}>
                 <label className={labelCls}>{f.label}</label>
-                <input type="text" name={f.name} value={(settings as Record<string, string>)[f.name] || ""} onChange={set} className={inputCls} />
+                <input type="text" name={f.name} value={(settings as unknown as Record<string, string>)[f.name] || ""} onChange={set} className={inputCls} />
               </div>
             ))}
           </div>
