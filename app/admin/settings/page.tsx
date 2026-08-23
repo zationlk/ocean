@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
             {[{ name: "companyName", label: "Company Name" }, { name: "tagline", label: "Tagline" }, { name: "email", label: "Email" }, { name: "website", label: "Website" }].map(f => (
               <div key={f.name}>
                 <label className={labelCls}>{f.label}</label>
-                <input type="text" name={f.name} value={(settings as Record<string, string>)[f.name] || ""} onChange={set} className={inputCls} />
+                <input type="text" name={f.name} value={(settings as unknown as Record<string, string>)[f.name] || ""} onChange={set} className={inputCls} />
               </div>
             ))}
             <div className="sm:col-span-2">
