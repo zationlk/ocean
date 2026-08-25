@@ -17,6 +17,7 @@
     "framer-motion": "^11.3.8",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.414.0",
+    "mysql2": "^3.23.4",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
     "react": "^18",

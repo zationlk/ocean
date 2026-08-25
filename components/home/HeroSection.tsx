@@ -31,18 +31,6 @@ const slides = [
     accent: "#D4AF37",
     tag: "9 Product Categories",
   },
-  {
-    badge: "Showroom, Negombo",
-    title: "Visit Our",
-    highlight: "Showroom",
-    titleEnd: " Today",
-    subtitle: "591 Chilaw Road, Kattuwa, Negombo — see our complete range of lighting and bathware in person.",
-    // ── Replace with your own image: place file at public/hero/slide-3.jpg ──
-    image: "/hero/slide-3.jpg",
-    cta: { text: "Get Directions", href: "/contact" },
-    accent: "#D4AF37",
-    tag: "Mon–Sat Open",
-  },
 ];
 
 // 3D tilt card component

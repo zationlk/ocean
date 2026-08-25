@@ -7,7 +7,7 @@ import Image from "next/image";
 import {
   LayoutDashboard, Package, FolderOpen, MessageSquare,
   Settings, LogOut, Menu, X, Image as ImageIcon,
-  ChevronRight, ExternalLink, Bell, Search,
+  ChevronRight, ExternalLink, Bell, Search, Building2, Images,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +17,8 @@ const navItems = [
   { href: "/admin/dashboard",  label: "Dashboard",  icon: LayoutDashboard, badge: null },
   { href: "/admin/products",   label: "Products",   icon: Package,         badge: null },
   { href: "/admin/categories", label: "Categories", icon: FolderOpen,      badge: null },
+  { href: "/admin/projects",   label: "Projects",   icon: Building2,       badge: null },
+  { href: "/admin/gallery",    label: "Gallery",    icon: Images,          badge: null },
   { href: "/admin/inquiries",  label: "Inquiries",  icon: MessageSquare,   badge: "3" },
   { href: "/admin/media",      label: "Media",      icon: ImageIcon,       badge: null },
   { href: "/admin/settings",   label: "Settings",   icon: Settings,        badge: null },

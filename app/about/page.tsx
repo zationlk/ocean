@@ -70,7 +70,7 @@ export default function AboutPage() {
             <div className="relative">
               <div className="rounded-3xl overflow-hidden border border-brand-border">
                 <img
-                  src="https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=700&q=80"
+                  src="/images/our-heritage.jpg"
                   alt="Ocean Lighting Solutions Showroom"
                   className="w-full h-[450px] object-cover"
                 />

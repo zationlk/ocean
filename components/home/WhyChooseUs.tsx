@@ -45,7 +45,7 @@ export default function WhyChooseUs() {
             {/* Main image with 3D tilt feel */}
             <div className="relative rounded-3xl overflow-hidden border border-brand-border group">
               <img
-                src="https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80"
+                src="/images/why-choose-us.jpg"
                 alt="Ocean Lighting Solutions Showroom"
                 className="w-full h-[520px] object-cover group-hover:scale-105 transition-transform duration-700"
                 loading="lazy"

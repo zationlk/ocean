@@ -8,7 +8,8 @@ export const metadata: Metadata = {
     "Explore our completed lighting and bathware projects across Sri Lanka — hotels, residences, offices, and outdoor spaces transformed by OCEAN Lighting Solutions.",
 };
 
-const projects = [
+// Static fallback data
+const staticProjects = [
   {
     id: "proj-1",
     title: "Serenity Beach Resort – Full Lighting & Bathware Renovation",
@@ -86,7 +87,24 @@ const categoryColors: Record<string, string> = {
   Outdoor: "bg-green-50 text-green-700 border border-green-100",
 };
 
-export default function ProjectsPage() {
+async function getProjects() {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/projects`, {
+      cache: 'no-store',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch projects from API:", error);
+  }
+  return staticProjects;
+}
+
+export default async function ProjectsPage() {
+  const projects = await getProjects();
+
   return (
     <div className="min-h-screen bg-brand-bg">
       {/* Hero */}
@@ -123,7 +141,7 @@ export default function ProjectsPage() {
       {/* Projects grid */}
       <div className="container-custom py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
+          {projects.map((project: any, index: number) => (
             <div
               key={project.id}
               className={`bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden hover:border-gold/30 hover:shadow-card-hover transition-all duration-300 group ${
@@ -165,7 +183,7 @@ export default function ProjectsPage() {
                     {project.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
+                    {project.tags.map((tag: string) => (
                       <span
                         key={tag}
                         className="text-xs bg-gold-50 text-gold-700 font-semibold px-3 py-1 rounded-full uppercase tracking-wider"
@@ -182,7 +200,7 @@ export default function ProjectsPage() {
                     Project Highlights
                   </h3>
                   <ul className="space-y-2">
-                    {project.highlights.map((h) => (
+                    {project.highlights.map((h: string) => (
                       <li key={h} className="flex items-start gap-2 text-sm text-brand-text font-light">
                         <CheckCircle size={14} className="text-gold mt-0.5 shrink-0" />
                         {h}

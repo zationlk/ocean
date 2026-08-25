@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { galleryItems } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { galleryItems as staticGalleryItems } from "@/lib/data";
 import { X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 // Extended gallery with more entries for a richer feel
-const extendedGallery = [
-  ...galleryItems,
+const extendedStaticGallery = [
+  ...staticGalleryItems,
   {
     id: "gal-7",
     title: "Hotel Corridor",
@@ -62,13 +62,35 @@ const heights = [
 ];
 
 export default function GalleryPage() {
+  const [galleryItems, setGalleryItems] = useState(extendedStaticGallery);
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGalleryItems();
+  }, []);
+
+  const fetchGalleryItems = async () => {
+    try {
+      const response = await fetch('/api/gallery');
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.length) {
+          setGalleryItems(data);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch gallery items from API:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered =
     activeCategory === "All"
-      ? extendedGallery
-      : extendedGallery.filter((item) => item.category === activeCategory);
+      ? galleryItems
+      : galleryItems.filter((item) => item.category === activeCategory);
 
   const lightboxItem = lightboxIndex !== null ? filtered[lightboxIndex] : null;
 
@@ -115,8 +137,8 @@ export default function GalleryPage() {
               {cat}
               <span className="ml-1.5 text-xs opacity-70">
                 ({cat === "All"
-                  ? extendedGallery.length
-                  : extendedGallery.filter((i) => i.category === cat).length})
+                  ? galleryItems.length
+                  : galleryItems.filter((i: any) => i.category === cat).length})
               </span>
             </button>
           ))}
