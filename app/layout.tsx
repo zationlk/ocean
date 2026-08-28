@@ -7,6 +7,9 @@ import { SiteSettings } from "@/lib/types"
 import { unstable_cache } from "next/cache"
 import { query } from "@/lib/mysql"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 
 const DEFAULT_COMPANY_NAME = "Ocean Lighting Solutions"
 const DEFAULT_META_DESCRIPTION = "Ocean Lighting Solutions – Premium LED lighting, electrical items, and luxury bathware in Negombo, Sri Lanka. Visit our showroom at 591, Chilaw Road, Kattuwa."
