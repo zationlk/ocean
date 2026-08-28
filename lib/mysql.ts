@@ -10,7 +10,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: process.env.MYSQL_HOST?.includes('layerbase') || process.env.MYSQL_HOST?.includes('psdb.cloud') ? {} : undefined,
+  ssl: process.env.MYSQL_HOST?.includes('layerbase') || process.env.MYSQL_HOST?.includes('psdb.cloud') ? {
+    rejectUnauthorized: false
+  } : undefined,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
 });
