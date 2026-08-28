@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
 
-// MySQL connection pool
+// MySQL/MariaDB connection pool configured for Layerbase
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST || '127.0.0.1',
   port: parseInt(process.env.MYSQL_PORT || '3306'),
@@ -10,6 +10,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  ssl: process.env.MYSQL_HOST?.includes('layerbase') || process.env.MYSQL_HOST?.includes('psdb.cloud') ? {} : undefined,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 });
 
 export async function query(sql: string, params?: any[]) {

@@ -1,7 +1,5 @@
 import { query } from "@/lib/mysql"
 
-export const dynamic = "force-dynamic"
-
 export default async function sitemap() {
   const baseUrl = "https://www.oceanlighting.lk"
 
