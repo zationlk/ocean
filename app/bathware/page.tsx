@@ -3,9 +3,27 @@ import { Suspense } from "react";
 import BathwareClient from "./BathwareClient";
 
 export const metadata: Metadata = {
-  title: "Bathware & Plumbing",
+  title: "Luxury Bathware & Sanitaryware Showroom Negombo | Ocean Lighting",
   description:
-    "Browse our complete range of premium bathware — toilets, wash basins, faucets, showers, bathroom mirrors, vanity units, kitchen sinks and plumbing accessories.",
+    "Explore luxury bathware in Negombo — water closets, wash basins, thermostatic showers, mixer taps, LED bathroom mirrors, vanity cabinets, and kitchen sinks in Sri Lanka.",
+  keywords: [
+    "bathware Negombo",
+    "luxury sanitaryware Sri Lanka",
+    "water closet toilet Negombo",
+    "wash basin Sri Lanka",
+    "bathroom faucets mixers Negombo",
+    "rain shower systems Sri Lanka",
+    "LED bathroom mirrors Negombo",
+    "vanity units Sri Lanka",
+  ],
+  alternates: { canonical: "https://www.oceanlighting.lk/bathware" },
+  openGraph: {
+    title: "Luxury Bathware & Sanitaryware Showroom Negombo | Ocean Lighting",
+    description: "Discover luxury toilets, basins, showers, faucets, and vanity units at Ocean Lighting & Bathware Showroom in Negombo.",
+    url: "https://www.oceanlighting.lk/bathware",
+    siteName: "Ocean Lighting Solutions",
+    images: [{ url: "https://www.oceanlighting.lk/og-image.jpg", alt: "Luxury Bathware Showroom Negombo" }],
+  },
 };
 
 export default function BathwarePage() {

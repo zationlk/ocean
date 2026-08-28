@@ -3,8 +3,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { ArrowRight, Phone, Sparkles, ChevronDown } from "lucide-react";
-import { siteSettings } from "@/lib/data";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const defaultSiteSettings = {
+  telephone: "",
+};
 
 const slides = [
   {
@@ -65,7 +70,16 @@ export default function HeroSection() {
   const [current, setCurrent] = useState(0);
   const [prev, setPrev]       = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   // Parallax scroll
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });

@@ -30,7 +30,7 @@ export default function BackToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
-        "fixed bottom-24 right-5 z-40 w-12 h-12 flex items-center justify-center",
+        "fixed bottom-6 right-6 z-40 w-12 h-12 flex items-center justify-center",
         "bg-brand-charcoal rounded-full transition-all duration-300 hover:-translate-y-1",
         "border border-brand-border hover:border-gold/50 hover:shadow-gold-glow"
       )}

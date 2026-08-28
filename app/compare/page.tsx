@@ -1,12 +1,43 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useCompare } from "@/context/CompareContext";
 import Link from "next/link";
 import { GitCompare, X, ArrowLeft, Check, Minus, MessageCircle } from "lucide-react";
-import { siteSettings } from "@/lib/data";
+import { SiteSettings } from "@/lib/types";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+import { buildProductWhatsAppMessage } from "@/lib/utils";
+
+const DEFAULT_SETTINGS: SiteSettings = {
+  companyName: "",
+  tagline: "",
+  address: "",
+  email: "",
+  website: "",
+  telephone: "",
+  mobile: "",
+  whatsapp: "",
+  businessHours: { weekdays: "", saturday: "", sunday: "" },
+  socialMedia: { facebook: "", instagram: "", youtube: "" },
+  heroTitle: "",
+  heroSubtitle: "",
+  aboutText: "",
+  metaDescription: "",
+};
 
 export default function ComparePage() {
   const { items, remove, clear } = useCompare();
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data: any) => {
+        if (data && !data.error) {
+          setSiteSettings({ ...DEFAULT_SETTINGS, ...data });
+        }
+      })
+      .catch((error) => console.error("Failed to load settings:", error));
+  }, []);
 
   if (items.length < 2) {
     return (
@@ -43,7 +74,6 @@ export default function ComparePage() {
     );
   }
 
-  // Collect all unique spec/feature keys
   const allSpecKeys = Array.from(
     new Set(items.flatMap((item) => Object.keys(item.specifications || {})))
   );
@@ -129,7 +159,7 @@ export default function ComparePage() {
                         View
                       </Link>
                       <a
-                        href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMsg}`}
+                        href={`https://wa.me/${siteSettings.whatsapp}?text=${encodeURIComponent(buildProductWhatsAppMessage(item))}`}
                         target="_blank"
                         rel="noopener noreferrer"
                           className="w-8 h-8 bg-green-500/10 hover:bg-green-500 rounded-lg flex items-center justify-center transition-colors group/wa"
@@ -160,7 +190,6 @@ export default function ComparePage() {
                 ))}
               </div>
 
-              {/* Collect all unique features */}
               {Array.from(new Set(items.flatMap((i) => i.features || []))).map((feat) => (
                 <div
                   key={feat}

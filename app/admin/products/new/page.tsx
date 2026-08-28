@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Plus, X, ImagePlus, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, ImagePlus } from "lucide-react";
 import Link from "next/link";
-import { categories } from "@/lib/data";
+import { Category } from "@/lib/types";
 import { createProduct, buildSlug } from "@/lib/admin-actions";
 import toast from "react-hot-toast";
 
@@ -14,15 +14,33 @@ const labelCls = "block text-[10px] font-bold text-white/30 uppercase tracking-w
 export default function NewProductPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [supabaseError, setSupabaseError] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [form, setForm] = useState({
-    name: "", category: "", shortDescription: "", description: "",
+    name: "", mainCategory: "", category: "", subcategory: "", modelNumber: "", shortDescription: "", description: "",
     isFeatured: false, isNew: false, badge: "",
   });
   const [images,   setImages]   = useState<string[]>([""]);
   const [features, setFeatures] = useState<string[]>([""]);
   const [specs,    setSpecs]    = useState<{ key: string; value: string }[]>([{ key: "", value: "" }]);
+
+  const fetchCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } else {
+        toast.error("Failed to load categories");
+      }
+    } catch {
+      toast.error("Failed to load categories");
+    } finally { setCategoriesLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
   const set = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -32,7 +50,6 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setSupabaseError(false);
 
     const specsObj: Record<string, string> = {};
     specs.filter(s => s.key.trim()).forEach(s => { specsObj[s.key.trim()] = s.value.trim(); });
@@ -40,7 +57,9 @@ export default function NewProductPage() {
     const payload = {
       name:              form.name.trim(),
       slug:              buildSlug(form.name),
-      category:          form.category,
+      category:          form.mainCategory || form.category,
+      subcategory:       form.subcategory,
+      model_number:      form.modelNumber.trim(),
       short_description: form.shortDescription.trim(),
       description:       form.description.trim(),
       images:            images.filter(u => u.trim()),
@@ -54,16 +73,15 @@ export default function NewProductPage() {
     const { error } = await createProduct(payload);
 
     if (error) {
-      // Supabase not connected — show warning but treat as success for demo
-      console.warn("Supabase insert failed (likely not configured):", error);
-      setSupabaseError(true);
-      toast.success("Product saved locally (Supabase not connected)");
+      toast.error("Failed to create: " + error);
     } else {
       toast.success("Product created successfully!");
+      setSaving(false);
+      router.push("/admin/products");
+      return;
     }
 
     setSaving(false);
-    router.push("/admin/products");
   };
 
   return (
@@ -79,28 +97,61 @@ export default function NewProductPage() {
         </div>
       </div>
 
-      {supabaseError && (
-        <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-          <AlertCircle size={16} className="text-amber-400 shrink-0" />
-          <p className="text-amber-400/80 text-xs">Supabase not connected — data saved in memory only. Configure <code className="bg-amber-500/10 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> to persist.</p>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Basic info */}
         <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-6 space-y-5">
           <h3 className="font-semibold text-white text-sm">Basic Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label className={labelCls}>Product Name *</label>
               <input type="text" name="name" value={form.name} onChange={set} required placeholder="e.g. LED Panel Light 60W" className={inputCls} />
               {form.name && <p className="text-[10px] text-white/25 mt-1 font-mono">slug: {buildSlug(form.name)}</p>}
             </div>
             <div>
-              <label className={labelCls}>Category *</label>
-              <select name="category" value={form.category} onChange={set} required className={`${inputCls} cursor-pointer`}>
-                <option value="">Select category…</option>
-                {categories.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
+              <label className={labelCls}>Model Number</label>
+              <input type="text" name="modelNumber" value={form.modelNumber} onChange={set} placeholder="e.g. OLS-PL-60W-001" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Main Category *</label>
+              <select
+                name="mainCategory"
+                value={form.mainCategory}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setForm((p) => ({ ...p, mainCategory: val, category: val, subcategory: "" }));
+                }}
+                required
+                className={`${inputCls} cursor-pointer`}
+              >
+                <option value="">Select Main Category…</option>
+                <option value="lighting">Lighting & Electrical</option>
+                <option value="bathware">Bathware & Sanitaryware</option>
+              </select>
+            </div>
+            <div className="md:col-start-2">
+              <label className={labelCls}>Subcategory *</label>
+              <select
+                name="subcategory"
+                value={form.subcategory}
+                onChange={(e) => setForm((p) => ({ ...p, subcategory: e.target.value }))}
+                required
+                disabled={!form.mainCategory || categoriesLoading}
+                className={`${inputCls} cursor-pointer disabled:opacity-50`}
+              >
+                <option value="">
+                  {!form.mainCategory
+                    ? "Select Main Category first…"
+                    : categoriesLoading
+                    ? "Loading subcategories…"
+                    : "Select subcategory…"}
+                </option>
+                {categories
+                  .filter((c) => (c.mainCategory ?? c.main_category) === form.mainCategory)
+                  .map((c) => (
+                    <option key={c.id} value={c.slug}>
+                      {c.icon && <span>{c.icon} </span>}{c.name}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>

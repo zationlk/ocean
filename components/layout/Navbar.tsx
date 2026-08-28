@@ -8,36 +8,25 @@ import {
   Lightbulb, Droplets, Home, Images, Building2, Info, Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { siteSettings } from "@/lib/data";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
 import SearchModal from "@/components/ui/SearchModal";
 import Image from "next/image";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+import { Category } from "@/lib/types";
 
-const LIGHTING_CATS = [
-  { href: "/lighting?category=indoor-lighting",    label: "Indoor Lighting",     icon: "💡" },
-  { href: "/lighting?category=outdoor-lighting",   label: "Outdoor Lighting",    icon: "🌿" },
-  { href: "/lighting?category=commercial-lighting",label: "Commercial Lighting", icon: "🏢" },
-  { href: "/lighting?category=led-bulbs",          label: "LED Bulbs",           icon: "🔆" },
-  { href: "/lighting?category=led-tube-lights",    label: "LED Tube Lights",     icon: "📏" },
-  { href: "/lighting?category=led-ceiling-lights", label: "LED Ceiling Lights",  icon: "⭕" },
-  { href: "/lighting?category=led-strip-lighting", label: "LED Strip Lighting",  icon: "〰️" },
-  { href: "/lighting?category=led-mirror-lights",  label: "LED Mirror Lights",   icon: "🔲" },
-  { href: "/lighting?category=led-step-lights",    label: "LED Step Lights",     icon: "🪜" },
-  { href: "/lighting?category=electrical-items",   label: "Electrical Items",    icon: "⚡" },
-];
+interface NavCategory {
+  href: string;
+  label: string;
+  icon: string;
+}
 
-const BATHWARE_CATS = [
-  { href: "/bathware?category=toilets",               label: "Toilets (WC)",           icon: "🚽" },
-  { href: "/bathware?category=wash-basins",           label: "Wash Basins",            icon: "🪣" },
-  { href: "/bathware?category=faucets-mixers",        label: "Faucets & Mixers",       icon: "🚰" },
-  { href: "/bathware?category=showers",               label: "Showers",                icon: "🚿" },
-  { href: "/bathware?category=bathroom-accessories",  label: "Bathroom Accessories",   icon: "🧴" },
-  { href: "/bathware?category=bathroom-mirrors",      label: "Bathroom Mirrors",       icon: "🪞" },
-  { href: "/bathware?category=vanity-units",          label: "Vanity Units",           icon: "🗄️" },
-  { href: "/bathware?category=kitchen-sinks-faucets", label: "Kitchen Sinks & Faucets",icon: "🍽️" },
-  { href: "/bathware?category=plumbing-accessories",  label: "Plumbing Accessories",   icon: "🔧" },
-];
+const defaultSiteSettings = {
+  address: "",
+  telephone: "",
+  mobile: "",
+  email: "",
+};
 
 export default function Navbar() {
   const [isScrolled,     setIsScrolled]     = useState(false);
@@ -45,6 +34,52 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string|null>(null);
   const [searchOpen,     setSearchOpen]     = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string|null>(null);
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadCats() {
+      try {
+        const res = await fetch("/api/categories", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) setCategories(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Failed to load nav categories:", err);
+      } finally {
+        if (!cancelled) setCategoriesLoading(false);
+      }
+    }
+    loadCats();
+    return () => { cancelled = true; };
+  }, []);
+
+  const LIGHTING_CATS: NavCategory[] = categories
+    .filter(c => (c.mainCategory ?? c.main_category) === "lighting")
+    .map(c => ({
+      href: `/lighting?category=${c.slug}`,
+      label: c.name,
+      icon: c.icon || "💡",
+    }));
+
+  const BATHWARE_CATS: NavCategory[] = categories
+    .filter(c => (c.mainCategory ?? c.main_category) === "bathware")
+    .map(c => ({
+      href: `/bathware?category=${c.slug}`,
+      label: c.name,
+      icon: c.icon || "🚽",
+    }));
 
   const pathname = usePathname();
   const { items: wishlistItems } = useWishlist();
@@ -58,7 +93,6 @@ export default function Navbar() {
 
   useEffect(() => { setIsMobileOpen(false); setMobileExpanded(null); }, [pathname]);
 
-  // ⌘K / Ctrl+K opens search
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setSearchOpen(true); }
@@ -82,10 +116,10 @@ export default function Navbar() {
             {siteSettings.address}
           </span>
           <div className="flex items-center gap-5 text-xs">
-            <a href={`tel:${siteSettings.telephone.replace(/\s/g,"")}`} className="flex items-center gap-1.5 text-brand-text/70 hover:text-gold transition-colors">
+            <a href={`tel:${siteSettings.telephone?.replace(/\s/g,"")}`} className="flex items-center gap-1.5 text-brand-text/70 hover:text-gold transition-colors">
               <Phone size={11} className="text-gold" />{siteSettings.telephone}
             </a>
-            <a href={`tel:${siteSettings.mobile.replace(/\s/g,"")}`} className="flex items-center gap-1.5 text-brand-text/70 hover:text-gold transition-colors">
+            <a href={`tel:${siteSettings.mobile?.replace(/\s/g,"")}`} className="flex items-center gap-1.5 text-brand-text/70 hover:text-gold transition-colors">
               <Phone size={11} className="text-gold" />{siteSettings.mobile}
             </a>
             <a href={`mailto:${siteSettings.email}`} className="text-brand-text/70 hover:text-gold transition-colors">
@@ -139,14 +173,16 @@ export default function Navbar() {
                   <div className="absolute top-full left-0 mt-1 w-72 bg-brand-charcoal rounded-2xl shadow-2xl border border-brand-border overflow-hidden z-50 animate-fade-in">
                     <div className="p-2">
                       <div className="text-[10px] font-bold text-brand-text/40 uppercase tracking-widest px-3 py-2">Lighting & Electrical</div>
-                      {LIGHTING_CATS.map(c => (
+                      {LIGHTING_CATS.length > 0 ? LIGHTING_CATS.map(c => (
                         <Link key={c.href} href={c.href}
                           className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-brand-text/80 hover:bg-gold/10 hover:text-gold transition-all group/item"
                         >
                           <span className="text-base w-5 text-center">{c.icon}</span>
                           <span>{c.label}</span>
                         </Link>
-                      ))}
+                      )) : (
+                        <div className="px-3 py-3 text-xs text-white/20">Loading categories…</div>
+                      )}
                       <div className="border-t border-brand-border mt-2 pt-2 px-3 pb-1">
                         <Link href="/lighting" className="text-xs text-gold font-semibold hover:underline">View all lighting →</Link>
                       </div>
@@ -169,14 +205,16 @@ export default function Navbar() {
                   <div className="absolute top-full left-0 mt-1 w-72 bg-brand-charcoal rounded-2xl shadow-2xl border border-brand-border overflow-hidden z-50 animate-fade-in">
                     <div className="p-2">
                       <div className="text-[10px] font-bold text-brand-text/40 uppercase tracking-widest px-3 py-2">Bathware & Plumbing</div>
-                      {BATHWARE_CATS.map(c => (
+                      {BATHWARE_CATS.length > 0 ? BATHWARE_CATS.map(c => (
                         <Link key={c.href} href={c.href}
                           className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-brand-text/80 hover:bg-gold/10 hover:text-gold transition-all group/item"
                         >
                           <span className="text-base w-5 text-center">{c.icon}</span>
                           <span>{c.label}</span>
                         </Link>
-                      ))}
+                      )) : (
+                        <div className="px-3 py-3 text-xs text-white/20">Loading categories…</div>
+                      )}
                       <div className="border-t border-brand-border mt-2 pt-2 px-3 pb-1">
                         <Link href="/bathware" className="text-xs text-gold font-semibold hover:underline">View all bathware →</Link>
                       </div>

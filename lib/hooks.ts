@@ -128,6 +128,8 @@ export function useGallery(category?: string, fallback?: GalleryItem[]) {
   return { items, loading, refetch: fetchGallery }
 }
 
+import { fetchSettingsCached } from "@/lib/settings-cache"
+
 export function useSettings(fallback?: Record<string, string>) {
   const [settings, setSettings] = useState<Record<string, string>>(fallback || {})
   const [loading, setLoading] = useState(true)
@@ -135,15 +137,9 @@ export function useSettings(fallback?: Record<string, string>) {
   const fetchSettings = useCallback(async () => {
     setLoading(true)
     try {
-      const supabase = createSupabaseBrowserClient()
-      const { data, error } = await supabase.from("site_settings").select("*")
-
-      if (!error && data && data.length > 0) {
-        const settingsObj: Record<string, string> = {}
-        data.forEach((item: { key: string; value: string }) => {
-          settingsObj[item.key] = item.value
-        })
-        setSettings(settingsObj)
+      const data = await fetchSettingsCached()
+      if (Object.keys(data).length > 0) {
+        setSettings(data)
       } else if (fallback) {
         setSettings(fallback)
       }

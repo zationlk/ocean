@@ -1,90 +1,138 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Save, Plus, X, Loader2, ImagePlus, AlertCircle, Star, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { products as staticProducts, categories } from "@/lib/data";
+import { Category } from "@/lib/types";
 import { updateProduct, buildSlug } from "@/lib/admin-actions";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 const inputCls = "w-full px-4 py-3 bg-[#0a0a0c] text-white border border-white/8 rounded-xl text-sm outline-none focus:border-gold/50 focus:ring-2 focus:ring-gold/8 transition-all placeholder:text-white/20";
 const labelCls = "block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2";
 
 interface ProductForm {
-  name: string; category: string; shortDescription: string; description: string;
+  name: string; mainCategory: string; category: string; subcategory: string; modelNumber: string;
+  shortDescription: string; description: string;
   isFeatured: boolean; isNew: boolean; badge: string; images: string[];
 }
 
+interface ApiProduct {
+  id: string; name: string; slug: string; category: string; subcategory?: string;
+  modelNumber?: string; model_number?: string;
+  shortDescription?: string; short_description?: string; description?: string;
+  images: string[]; isFeatured?: boolean; isNew?: boolean;
+  is_featured?: boolean; is_new?: boolean; badge?: string;
+  features?: string[]; specifications?: Record<string, string>;
+}
+
+function normaliseProduct(p: ApiProduct): ApiProduct {
+  return {
+    ...p,
+    modelNumber: p.modelNumber ?? p.model_number ?? "",
+    isFeatured: !!(p.isFeatured ?? p.is_featured),
+    isNew:      !!(p.isNew ?? p.is_new),
+    shortDescription: p.shortDescription ?? p.short_description ?? p.description ?? "",
+  };
+}
+
 export default function EditProductPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
+  const params   = useParams();
+  const router   = useRouter();
+  const id       = params?.id as string;
 
   const [loading,       setLoading]       = useState(true);
   const [saving,        setSaving]        = useState(false);
   const [notFound,      setNotFound]      = useState(false);
-  const [supabaseOk,    setSupabaseOk]    = useState(true);
+  const [categories,    setCategories]    = useState<Category[]>([]);
   const [originalSlug, setOriginalSlug]  = useState("");
+  const [productId, setProductId]     = useState<string>("");
 
   const [form, setForm] = useState<ProductForm>({
-    name: "", category: "", shortDescription: "", description: "",
+    name: "", mainCategory: "", category: "", subcategory: "", modelNumber: "", shortDescription: "", description: "",
     isFeatured: false, isNew: false, badge: "", images: [""],
   });
   const [features, setFeatures] = useState<string[]>([""]);
   const [specs,    setSpecs]    = useState<{ key: string; value: string }[]>([{ key: "", value: "" }]);
 
-  useEffect(() => {
+  const loadData = useCallback(async () => {
     if (!id) return;
+    setLoading(true);
+    setNotFound(false);
 
-    // Try Supabase first
-    const loadFromSupabase = async () => {
-      try {
-        const sb = createSupabaseBrowserClient();
-        const { data, error } = await sb.from("products").select("*").eq("id", id).single();
-        if (!error && data) {
-          setSupabaseOk(true);
-          setOriginalSlug(data.slug || "");
-          setForm({
-            name:             data.name || "",
-            category:         data.category || "",
-            shortDescription: data.short_description || "",
-            description:      data.description || "",
-            isFeatured:       data.is_featured || false,
-            isNew:            data.is_new || false,
-            badge:            data.badge || "",
-            images:           data.images?.length ? data.images : [""],
-          });
-          setFeatures(data.features?.length ? data.features : [""]);
-          const sp = data.specifications ? Object.entries(data.specifications).map(([k, v]) => ({ key: k, value: v as string })) : [{ key: "", value: "" }];
-          setSpecs(sp.length ? sp : [{ key: "", value: "" }]);
-          setLoading(false);
-          return;
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        fetch(`/api/products?slug=${encodeURIComponent(id)}`),
+        fetch("/api/categories"),
+      ]);
+
+      if (categoriesRes.ok) {
+        const cdata = await categoriesRes.json();
+        setCategories(Array.isArray(cdata) ? cdata : []);
+      } else {
+        toast.error("Failed to load categories");
+      }
+
+      let product: any = null;
+
+      if (productsRes.ok) {
+        const pdata = await productsRes.json();
+        if (pdata && !Array.isArray(pdata) && (pdata.id || pdata.slug)) {
+          product = normaliseProduct(pdata);
+        } else if (Array.isArray(pdata) && pdata.length > 0) {
+          const found = pdata.find((p: any) => String(p.id) === id || p.slug === id) || pdata[0];
+          product = normaliseProduct(found);
         }
-      } catch { /* fall through to static */ }
+      }
 
-      // Fall back to static data
-      setSupabaseOk(false);
-      const product = staticProducts.find(p => p.id === id || p.slug === id);
-      if (!product) { setNotFound(true); setLoading(false); return; }
-      setOriginalSlug(product.slug);
+      if (!product) {
+        const allRes = await fetch("/api/products");
+        if (allRes.ok) {
+          const allData = await allRes.json();
+          const allProducts: ApiProduct[] = Array.isArray(allData) ? allData.map(normaliseProduct) : [];
+          product = allProducts.find(p => String(p.id) === id || p.slug === id) || null;
+        }
+      }
+
+      if (!product) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      const isBathwareSub = [
+        "toilets-wc", "wash-basins", "faucets-mixers", "showers",
+        "bathroom-accessories", "bathroom-mirrors", "vanity-units",
+        "kitchen-sinks-faucets", "plumbing-accessories"
+      ].includes(product.subcategory || product.category);
+
+      const computedMainCat = product.category === "bathware" || isBathwareSub ? "bathware" : "lighting";
+      const computedSubCat = product.subcategory || (product.category !== "lighting" && product.category !== "bathware" ? product.category : "");
+
+      setProductId(String(product.id));
+      setOriginalSlug(product.slug || "");
       setForm({
-        name: product.name, category: product.category,
+        name:             product.name || "",
+        mainCategory:     computedMainCat,
+        category:         computedMainCat,
+        subcategory:      computedSubCat,
+        modelNumber:      product.modelNumber || "",
         shortDescription: product.shortDescription || "",
-        description: product.description || "",
-        isFeatured: product.isFeatured || false, isNew: product.isNew || false,
-        badge: product.badge || "",
-        images: product.images.length ? product.images : [""],
+        description:      product.description || "",
+        isFeatured:       product.isFeatured || false,
+        isNew:            product.isNew || false,
+        badge:            product.badge || "",
+        images:           product.images?.length ? product.images : [""],
       });
       setFeatures(product.features?.length ? product.features : [""]);
-      const sp = product.specifications ? Object.entries(product.specifications).map(([k, v]) => ({ key: k, value: v })) : [{ key: "", value: "" }];
+      const sp = product.specifications ? Object.entries(product.specifications).map(([k, v]) => ({ key: k, value: v as string })) : [{ key: "", value: "" }];
       setSpecs(sp.length ? sp : [{ key: "", value: "" }]);
-      setLoading(false);
-    };
-
-    loadFromSupabase();
+    } catch {
+      toast.error("Failed to load product");
+    } finally { setLoading(false); }
   }, [id]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const set = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -101,7 +149,9 @@ export default function EditProductPage() {
     const payload = {
       name:              form.name.trim(),
       slug:              form.name.trim() !== "" ? buildSlug(form.name) : originalSlug,
-      category:          form.category,
+      category:          form.mainCategory || form.category,
+      subcategory:       form.subcategory,
+      model_number:      form.modelNumber.trim(),
       short_description: form.shortDescription.trim(),
       description:       form.description.trim(),
       images:            images.filter(u => u.trim()),
@@ -112,20 +162,18 @@ export default function EditProductPage() {
       badge:             form.badge.trim(),
     };
 
-    const { error } = await updateProduct(id, payload);
+    const { error } = await updateProduct(productId, payload);
 
     if (error) {
-      if (supabaseOk) {
-        toast.error("Failed to save: " + error);
-      } else {
-        toast.success("Changes saved locally (Supabase not connected)");
-      }
+      toast.error("Failed to save: " + error);
     } else {
       toast.success("Product updated successfully!");
+      setSaving(false);
+      router.push("/admin/products");
+      return;
     }
 
     setSaving(false);
-    router.push("/admin/products");
   };
 
   // convenience alias
@@ -175,28 +223,57 @@ export default function EditProductPage() {
         </div>
       </div>
 
-      {!supabaseOk && (
-        <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-          <AlertCircle size={15} className="text-amber-400 shrink-0" />
-          <p className="text-amber-400/80 text-xs">Supabase not connected — editing static data. Configure <code className="bg-amber-500/10 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> to persist changes.</p>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Basic info */}
         <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-6 space-y-5">
           <h3 className="font-semibold text-white text-sm">Basic Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label className={labelCls}>Product Name *</label>
               <input type="text" name="name" value={form.name} onChange={set} required className={inputCls} />
               {form.name && <p className="text-[10px] text-white/20 mt-1 font-mono">slug: {buildSlug(form.name)}</p>}
             </div>
             <div>
-              <label className={labelCls}>Category *</label>
-              <select name="category" value={form.category} onChange={set} required className={`${inputCls} cursor-pointer`}>
-                <option value="">Select category…</option>
-                {categories.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
+              <label className={labelCls}>Model Number</label>
+              <input type="text" name="modelNumber" value={form.modelNumber} onChange={set} placeholder="e.g. OLS-PL-60W-001" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Main Category *</label>
+              <select
+                name="mainCategory"
+                value={form.mainCategory}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setForm((p) => ({ ...p, mainCategory: val, category: val, subcategory: "" }));
+                }}
+                required
+                className={`${inputCls} cursor-pointer`}
+              >
+                <option value="">Select Main Category…</option>
+                <option value="lighting">Lighting & Electrical</option>
+                <option value="bathware">Bathware & Sanitaryware</option>
+              </select>
+            </div>
+            <div className="md:col-start-2">
+              <label className={labelCls}>Subcategory *</label>
+              <select
+                name="subcategory"
+                value={form.subcategory}
+                onChange={(e) => setForm((p) => ({ ...p, subcategory: e.target.value }))}
+                required
+                disabled={!form.mainCategory}
+                className={`${inputCls} cursor-pointer disabled:opacity-50`}
+              >
+                <option value="">
+                  {!form.mainCategory ? "Select Main Category first…" : "Select subcategory…"}
+                </option>
+                {categories
+                  .filter((c) => (c.mainCategory ?? c.main_category) === form.mainCategory)
+                  .map((c) => (
+                    <option key={c.id} value={c.slug}>
+                      {c.icon && <span>{c.icon} </span>}{c.name}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>

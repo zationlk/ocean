@@ -1,84 +1,116 @@
-import { NextResponse } from 'next/server'
-import { createSupabaseClient } from '@/lib/supabase'
+import { NextResponse } from 'next/server';
+import { query } from '@/lib/mysql';
+
+function normalise(c: any) {
+  return {
+    ...c,
+    mainCategory: c.mainCategory ?? c.main_category ?? 'lighting',
+    productCount: c.productCount ?? c.product_count ?? 0,
+    createdAt: c.createdAt ?? c.created_at,
+    updatedAt: c.updatedAt ?? c.updated_at,
+  };
+}
 
 export async function GET() {
-  const supabase = createSupabaseClient()
-
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .order('product_count', { ascending: false })
-
-  if (error) {
-    console.error('Categories fetch error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  try {
+    const sql = 'SELECT * FROM categories ORDER BY main_category ASC, product_count DESC';
+    const categories = await query(sql) as any[];
+    return NextResponse.json(categories.map(normalise) || []);
+  } catch (error: any) {
+    console.error('Categories fetch error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch categories' }, { status: 500 });
   }
-
-  return NextResponse.json(data || [])
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const supabase = createSupabaseClient()
+    const body = await request.json();
+    const { name, slug, description, icon, image, product_count, main_category } = body;
 
-    const { data, error } = await supabase
-      .from('categories')
-      .insert(body)
-      .select()
-      .single()
+    const sql = `
+      INSERT INTO categories (name, slug, main_category, description, icon, image, product_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const params = [
+      name,
+      slug,
+      main_category || 'lighting',
+      description,
+      icon || null,
+      image || null,
+      product_count || 0
+    ];
+    const result: any = await query(sql, params);
+    const insertId = result.insertId;
 
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    const getSql = 'SELECT * FROM categories WHERE id = ?';
+    const newCategories = await query(getSql, [insertId]) as any[];
+    const data = normalise(newCategories[0]);
+
+    return NextResponse.json({ success: true, data });
+  } catch (error: any) {
+    console.error('Category POST error:', error);
+    return NextResponse.json({ error: error.message || 'Invalid request body' }, { status: 400 });
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const body = await request.json()
-    const { id, ...updates } = body
-    const supabase = createSupabaseClient()
+    const body = await request.json();
+    const { id, ...updates } = body;
 
-    const { data, error } = await supabase
-      .from('categories')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!id) {
+      return NextResponse.json({ error: 'Category ID required' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    const fields: string[] = [];
+    const params: any[] = [];
+    const allowedFields = ['name', 'slug', 'description', 'icon', 'image', 'product_count', 'main_category'];
+
+    for (const key of allowedFields) {
+      if (key in updates) {
+        fields.push(`${key} = ?`);
+        params.push(updates[key]);
+      }
+    }
+
+    if (fields.length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+    }
+
+    fields.push('updated_at = CURRENT_TIMESTAMP');
+    params.push(id);
+
+    const sql = `UPDATE categories SET ${fields.join(', ')} WHERE id = ?`;
+    await query(sql, params);
+
+    const getSql = 'SELECT * FROM categories WHERE id = ?';
+    const updatedCategories = await query(getSql, [id]) as any[];
+    const data = normalise(updatedCategories[0]);
+
+    return NextResponse.json({ success: true, data });
+  } catch (error: any) {
+    console.error('Category PUT error:', error);
+    return NextResponse.json({ error: error.message || 'Invalid request body' }, { status: 400 });
   }
 }
 
 export async function DELETE(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ error: 'Category ID required' }, { status: 400 })
+      return NextResponse.json({ error: 'Category ID required' }, { status: 400 });
     }
 
-    const supabase = createSupabaseClient()
-    const { error } = await supabase.from('categories').delete().eq('id', id)
+    const sql = 'DELETE FROM categories WHERE id = ?';
+    await query(sql, [id]);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Category DELETE error:', error);
+    return NextResponse.json({ error: error.message || 'Invalid request' }, { status: 400 });
   }
 }

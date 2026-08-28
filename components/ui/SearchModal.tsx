@@ -3,8 +3,26 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { products, categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  image?: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  shortDescription?: string;
+  short_description?: string;
+  images: string[];
+}
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -13,7 +31,35 @@ interface SearchModalProps {
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/categories"),
+        ]);
+        if (productsRes.ok) {
+          const productsData = await productsRes.json();
+          setProducts(Array.isArray(productsData) ? productsData : productsData.data || []);
+        }
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json();
+          setCategories(Array.isArray(categoriesData) ? categoriesData : categoriesData.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch search data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -85,7 +131,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Results */}
         <div className="max-h-[60vh] overflow-y-auto">
-          {q.length < 2 ? (
+          {isLoading ? (
+            <div className="p-8 text-center">
+              <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-brand-text/60 text-sm">Loading search data...</p>
+            </div>
+          ) : q.length < 2 ? (
             /* Popular suggestions */
             <div className="p-5">
               <p className="text-xs font-semibold text-brand-text/50 uppercase tracking-wider mb-3">Popular Searches</p>

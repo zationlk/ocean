@@ -3,9 +3,24 @@ import { Shield, Award, Users, Zap, Target, Eye, Heart, Sparkles } from "lucide-
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Us",
+  title: "About Ocean Lighting Solutions | Premium LED & Bathware Negombo",
   description:
-    "Learn about Ocean Lighting Solutions – Sri Lanka's trusted supplier of premium LED lighting, electrical items, and quality bathware in Negombo.",
+    "Learn about Ocean Lighting Solutions — Sri Lanka's leading supplier of energy-efficient LED lighting, electrical items, and luxury bathware in Negombo.",
+  keywords: [
+    "About Ocean Lighting Solutions",
+    "lighting company Negombo",
+    "LED lighting supplier Sri Lanka",
+    "bathware importer Negombo",
+    "electrical supplier Negombo Sri Lanka",
+  ],
+  alternates: { canonical: "https://www.oceanlighting.lk/about" },
+  openGraph: {
+    title: "About Ocean Lighting Solutions | Premium LED & Bathware Negombo",
+    description: "Discover our heritage, mission, and range of premium LED lighting and luxury bathware products in Negombo, Sri Lanka.",
+    url: "https://www.oceanlighting.lk/about",
+    siteName: "Ocean Lighting Solutions",
+    images: [{ url: "https://www.oceanlighting.lk/og-image.jpg", alt: "About Ocean Lighting Solutions Negombo" }],
+  },
 };
 
 const values = [

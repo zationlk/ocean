@@ -3,23 +3,42 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronRight, Phone, MessageCircle, Check, ArrowLeft, ZoomIn, X, Heart, GitCompare } from "lucide-react";
-import { Product } from "@/lib/types";
-import { siteSettings } from "@/lib/data";
+import { Product, SiteSettings } from "@/lib/types";
 import ProductCard from "@/components/products/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
-import { cn } from "@/lib/utils";
+import { cn, buildProductWhatsAppMessage } from "@/lib/utils";
+import { fetchSettingsCached } from "@/lib/settings-cache";
 
 interface Props {
   product: Product;
   related: Product[];
 }
 
+const DEFAULT_SETTINGS: SiteSettings = {
+  companyName: "",
+  tagline: "",
+  address: "",
+  email: "",
+  website: "",
+  telephone: "",
+  mobile: "",
+  whatsapp: "",
+  businessHours: { weekdays: "", saturday: "", sunday: "" },
+  socialMedia: { facebook: "", instagram: "" },
+  heroTitle: "",
+  heroSubtitle: "",
+  aboutText: "",
+  metaDescription: "",
+};
+
 export default function ProductDetailClient({ product, related }: Props) {
   const [activeImage, setActiveImage] = useState(0);
   const [activeTab, setActiveTab] = useState<"description" | "specs" | "features">("description");
   const [zoomed, setZoomed] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   const { add: addWishlist, remove: removeWishlist, isInWishlist } = useWishlist();
   const { add: addCompare, remove: removeCompare, isInCompare, items: compareItems } = useCompare();
@@ -47,9 +66,26 @@ export default function ProductDetailClient({ product, related }: Props) {
     return () => document.removeEventListener("keydown", onKey);
   }, [zoomed]);
 
-  const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}" from Ocean Lighting Solutions. Could you please provide more details and pricing?`
-  );
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data: any) => {
+        const settings = Array.isArray(data) ? data[0] : (data.data || data);
+        if (settings) {
+          setSiteSettings({ ...DEFAULT_SETTINGS, ...settings });
+        }
+      })
+      .catch((error) => console.error("Failed to fetch settings:", error))
+      .finally(() => setSettingsLoading(false));
+  }, []);
+
+  const whatsappMessage = encodeURIComponent(buildProductWhatsAppMessage(product));
+
+  const whatsappHref = siteSettings.whatsapp
+    ? `https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`
+    : "#";
+  const telephoneHref = siteSettings.telephone
+    ? `tel:${siteSettings.telephone.replace(/\s/g, "")}`
+    : "#";
 
   // Recently viewed excluding current
   const recentlySeen = recentItems.filter((i) => i.id !== product.id).slice(0, 4);
@@ -135,9 +171,14 @@ export default function ProductDetailClient({ product, related }: Props) {
             <div className="text-xs text-gold font-bold uppercase tracking-widest mb-3">
               {product.category.replace(/-/g, " ")}
             </div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-white mb-4 leading-snug">
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-white mb-2 leading-snug">
               {product.name}
             </h1>
+            {product.modelNumber && (
+              <div className="text-sm text-white/40 font-mono mb-4">
+                Model Number: <span className="text-white/60">{product.modelNumber}</span>
+              </div>
+            )}
             <p className="text-brand-text leading-relaxed mb-6 pb-6 border-b border-brand-border font-light">
               {product.shortDescription}
             </p>
@@ -188,7 +229,7 @@ export default function ProductDetailClient({ product, related }: Props) {
             {/* CTA buttons */}
             <div className="space-y-3">
               <a
-                href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMessage}`}
+                href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-semibold py-4 rounded-xl transition-all duration-300 hover:shadow-lg"
@@ -200,7 +241,7 @@ export default function ProductDetailClient({ product, related }: Props) {
               </a>
               <div className="grid grid-cols-2 gap-3">
                 <a
-                  href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
+                  href={telephoneHref}
                   className="flex items-center justify-center gap-2 border-2 border-gold/40 text-gold hover:bg-gold hover:text-brand-dark font-semibold py-3 rounded-xl transition-all duration-300"
                 >
                   <Phone size={17} /> Call Us

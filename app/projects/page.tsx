@@ -1,84 +1,8 @@
-import { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, MapPin, Building2, Sparkles, CheckCircle } from "lucide-react";
-
-export const metadata: Metadata = {
-  title: "Projects",
-  description:
-    "Explore our completed lighting and bathware projects across Sri Lanka — hotels, residences, offices, and outdoor spaces transformed by OCEAN Lighting Solutions.",
-};
-
-// Static fallback data
-const staticProjects = [
-  {
-    id: "proj-1",
-    title: "Serenity Beach Resort – Full Lighting & Bathware Renovation",
-    category: "Hospitality",
-    location: "Negombo, Sri Lanka",
-    description:
-      "A complete lighting and sanitary overhaul of a 5-star beachfront resort. We imported, supplied, and installed 800+ LED fixtures and 140 luxury thermostatic rain shower columns, custom bidet suites, and facade illumination.",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
-    highlights: [
-      "800+ LED fixtures and 140 bath suites",
-      "60% energy and water savings achieved",
-      "Custom guest room brassware and crystal lighting",
-      "Successful 5-star standard rating compliance",
-    ],
-    tags: ["Commercial", "LED", "Rain Showers", "Bespoke Bathware"],
-    year: "2024",
-  },
-  {
-    id: "proj-2",
-    title: "Luxe Corporate HQ – Intelligent Workspace",
-    category: "Commercial",
-    location: "Colombo, Sri Lanka",
-    description:
-      "Design and supply of a full LED panel lighting system and touchless smart sanitary restroom solutions for a 6-floor office complex. The project integrated motion downlights and anti-fog LED mirror cabinets.",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80",
-    highlights: [
-      "Full office recessed LED panel systems",
-      "Touchless sensor sanitaryware installations",
-      "CRI >90 for high accuracy color rendering",
-      "Significant annual savings in electrical costs",
-    ],
-    tags: ["Commercial", "LED Downlights", "Smart Toilet", "Restrooms"],
-    year: "2024",
-  },
-  {
-    id: "proj-3",
-    title: "Mountain-View Villa – Luxury Home Suite",
-    category: "Residential",
-    location: "Kandy, Sri Lanka",
-    description:
-      "Bespoke interior lighting design and custom bathroom design for a luxury private villa. The project featured crystal chandeliers, freestanding acrylic bathtubs, brushed gold showers, and smart control setups.",
-    image: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=900&q=80",
-    highlights: [
-      "Custom crystal chandelier and gold accents",
-      "Lucite sanitary freestanding acrylic tub",
-      "Brushed Gold thermostatic shower mixers",
-      "Seamless app-controlled lighting scenes",
-    ],
-    tags: ["Residential", "Interior Design", "Bathtubs", "Showers"],
-    year: "2023",
-  },
-  {
-    id: "proj-4",
-    title: "Sakura Botanical Gardens – Landscape Lightscapes",
-    category: "Outdoor",
-    location: "Galle, Sri Lanka",
-    description:
-      "A comprehensive landscape lighting project for a private botanical garden. Deploying monocrystalline solar garden spikes, LED path lights, underwater pond illumination, and commercial flood lights.",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80",
-    highlights: [
-      "100% grid-free solar path installations",
-      "IP66-rated robust weatherproof housings",
-      "High-power LED spotlight highlighting trees",
-      "Automated dusk-to-dawn sensor switches",
-    ],
-    tags: ["Outdoor", "Solar Spikes", "Landscape Lights"],
-    year: "2023",
-  },
-];
+import { ArrowRight, MapPin, Building2, Sparkles, CheckCircle, Package } from "lucide-react";
 
 const categoryColors: Record<string, string> = {
   Hospitality: "bg-purple-50 text-purple-700 border border-purple-100",
@@ -87,23 +11,28 @@ const categoryColors: Record<string, string> = {
   Outdoor: "bg-green-50 text-green-700 border border-green-100",
 };
 
-async function getProjects() {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/projects`, {
-      cache: 'no-store',
-    });
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
-  } catch (error) {
-    console.error("Failed to fetch projects from API:", error);
-  }
-  return staticProjects;
-}
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function ProjectsPage() {
-  const projects = await getProjects();
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(`/api/projects`, {
+          cache: "no-store",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProjects(Array.isArray(data) ? data : data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects from API:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   return (
     <div className="min-h-screen bg-brand-bg">

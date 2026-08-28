@@ -1,68 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { galleryItems as staticGalleryItems } from "@/lib/data";
 import { X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
-// Extended gallery with more entries for a richer feel
-const extendedStaticGallery = [
-  ...staticGalleryItems,
-  {
-    id: "gal-7",
-    title: "Hotel Corridor",
-    description: "Linear LED pendant lighting for a luxury corridor",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
-    category: "Commercial",
-  },
-  {
-    id: "gal-8",
-    title: "Industrial Facility",
-    description: "High-bay LED upgrade for a manufacturing plant",
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
-    category: "Industrial",
-  },
-  {
-    id: "gal-9",
-    title: "Modern Kitchen",
-    description: "Under-cabinet LED strip and recessed downlights",
-    image: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=800&q=80",
-    category: "Residential",
-  },
-  {
-    id: "gal-10",
-    title: "Outdoor Pathway",
-    description: "Elegant pathway lighting for a gated community",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    category: "Outdoor",
-  },
-  {
-    id: "gal-11",
-    title: "Boutique Hotel Room",
-    description: "Warm pendant and wall sconce combination",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    category: "Commercial",
-  },
-  {
-    id: "gal-12",
-    title: "Home Office",
-    description: "Focused LED panel with bias lighting setup",
-    image: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=800&q=80",
-    category: "Residential",
-  },
-];
+import { GalleryItem } from "@/lib/types";
 
 const categories = ["All", "Commercial", "Residential", "Outdoor", "Industrial"];
 
-// Heights for masonry-like effect
 const heights = [
   "h-64", "h-80", "h-56", "h-72", "h-64", "h-80",
   "h-72", "h-64", "h-80", "h-56", "h-64", "h-72",
 ];
 
 export default function GalleryPage() {
-  const [galleryItems, setGalleryItems] = useState(extendedStaticGallery);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,9 +28,7 @@ export default function GalleryPage() {
       const response = await fetch('/api/gallery');
       if (response.ok) {
         const data = await response.json();
-        if (data?.length) {
-          setGalleryItems(data);
-        }
+        setGalleryItems(Array.isArray(data) ? data : (data.data || []));
       }
     } catch (err) {
       console.error("Failed to fetch gallery items from API:", err);
@@ -138,47 +88,64 @@ export default function GalleryPage() {
               <span className="ml-1.5 text-xs opacity-70">
                 ({cat === "All"
                   ? galleryItems.length
-                  : galleryItems.filter((i: any) => i.category === cat).length})
+                  : galleryItems.filter((i) => i.category === cat).length})
               </span>
             </button>
           ))}
         </div>
 
         {/* Masonry-style grid (3-col CSS columns) */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
-          {filtered.map((item, idx) => (
-            <div
-              key={item.id}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden cursor-pointer bg-brand-charcoal border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300"
-              onClick={() => setLightboxIndex(idx)}
-            >
-              <div className={cn("relative overflow-hidden", heights[idx % heights.length])}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/50 transition-all duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 backdrop-blur-sm rounded-full p-3">
-                    <ZoomIn size={22} className="text-white" />
+        {loading ? (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="break-inside-avoid rounded-2xl overflow-hidden bg-brand-charcoal border border-brand-border animate-pulse"
+              >
+                <div className={cn("skeleton", heights[i % heights.length])} />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 rounded-full skeleton" />
+                  <div className="h-3 w-full rounded-full skeleton" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
+            {filtered.map((item, idx) => (
+              <div
+                key={item.id}
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden cursor-pointer bg-brand-charcoal border border-brand-border hover:border-brand-primary hover:shadow-card-hover transition-all duration-300"
+                onClick={() => setLightboxIndex(idx)}
+              >
+                <div className={cn("relative overflow-hidden", heights[idx % heights.length])}>
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/50 transition-all duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 backdrop-blur-sm rounded-full p-3">
+                      <ZoomIn size={22} className="text-white" />
+                    </div>
+                  </div>
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-brand-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                      {item.category}
+                    </span>
                   </div>
                 </div>
-                <div className="absolute top-3 right-3">
-                  <span className="bg-brand-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                    {item.category}
-                  </span>
+                <div className="p-4">
+                  <h3 className="font-semibold text-white mb-1">{item.title}</h3>
+                  {item.description && (
+                    <p className="text-sm text-brand-text">{item.description}</p>
+                  )}
                 </div>
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-white mb-1">{item.title}</h3>
-                {item.description && (
-                  <p className="text-sm text-brand-text">{item.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="mt-16 text-center">

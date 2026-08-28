@@ -1,15 +1,54 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
-
-const brands = [
-  "TOTO", "Grohe", "Kohler", "Roca", "Philips",
-  "Osram", "Jaquar", "Panasonic", "Havells", "Wipro", "Crompton", "Bajaj",
-];
-
-const marqueeItems = [...brands, ...brands, ...brands];
+import { Brand } from "@/lib/types";
 
 export default function BrandsSection() {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadBrands() {
+      try {
+        const res = await fetch("/api/brands");
+        const data = await res.json();
+        setBrands(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load brands:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadBrands();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-brand-obsidian border-y border-brand-border overflow-hidden">
+        <div className="container-custom mb-10 text-center">
+          <div className="w-32 h-8 mx-auto rounded-full skeleton mb-4" />
+          <div className="w-96 h-8 mx-auto rounded-full skeleton mb-3" />
+          <div className="w-16 h-1 mx-auto skeleton" />
+        </div>
+        <div className="relative">
+          <div className="flex gap-4 animate-pulse" style={{ width: "max-content" }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="shrink-0 flex items-center justify-center h-12 px-7 rounded-xl border border-brand-border bg-brand-charcoal"
+              >
+                <div className="h-3 w-20 rounded-full skeleton" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const marqueeItems = [...brands, ...brands, ...brands];
+
   return (
     <section className="py-16 bg-brand-obsidian border-y border-brand-border overflow-hidden">
       <div className="container-custom mb-10 text-center">
@@ -30,11 +69,11 @@ export default function BrandsSection() {
         <div className="flex gap-4 animate-marquee" style={{ width: "max-content" }}>
           {marqueeItems.map((brand, index) => (
             <div
-              key={`${brand}-${index}`}
+              key={`${brand.id}-${index}`}
               className="shrink-0 flex items-center justify-center h-12 px-7 rounded-xl border border-brand-border bg-brand-charcoal hover:border-gold/50 transition-all duration-300 group cursor-default"
             >
               <span className="font-display font-bold text-sm text-brand-text/50 group-hover:text-white transition-colors duration-300 whitespace-nowrap tracking-widest uppercase">
-                {brand}
+                {brand.name}
               </span>
             </div>
           ))}

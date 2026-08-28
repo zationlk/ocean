@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Mail, Phone, MessageSquare, Check, Trash2, MailOpen, Clock, Inbox, Search, X } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { updateInquiryStatus, deleteInquiry } from "@/lib/admin-actions";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,8 +15,12 @@ interface Inquiry {
   subject: string;
   message: string;
   status: "unread" | "read" | "replied";
-  created_at: string;
+  createdAt: string;
+  productId?: string;
+  productName?: string;
+  product_id?: string;
   product_name?: string;
+  created_at?: string;
 }
 
 const STATUS = {
@@ -24,6 +28,15 @@ const STATUS = {
   read:    { label: "Read",    cls: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
   replied: { label: "Replied", cls: "bg-green-500/10 text-green-400 border-green-500/20" },
 };
+
+function normalise(i: Inquiry): Inquiry {
+  return {
+    ...i,
+    productId: i.productId ?? i.product_id,
+    productName: i.productName ?? i.product_name,
+    createdAt: i.createdAt ?? i.created_at ?? "",
+  };
+}
 
 function fmtDate(s: string) {
   return new Date(s).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
@@ -36,41 +49,47 @@ export default function InquiriesPage() {
   const [inquiries, setInquiries]   = useState<Inquiry[]>([]);
   const [loading, setLoading]       = useState(true);
   const [selected, setSelected]     = useState<string | null>(null);
-  const [noSupabase, setNoSupabase] = useState(false);
   const [search, setSearch]         = useState("");
 
   const fetchInquiries = useCallback(async () => {
     setLoading(true);
     try {
-      const sb = createSupabaseBrowserClient();
-      const { data, error } = await sb.from("inquiries").select("*").order("created_at", { ascending: false });
-      if (error) { setNoSupabase(true); }
-      else { setInquiries(data ?? []); }
-    } catch { setNoSupabase(true); }
-    finally { setLoading(false); }
+      const res = await fetch("/api/inquiries");
+      if (res.ok) {
+        const data = await res.json();
+        setInquiries(Array.isArray(data) ? data.map(normalise) : []);
+      } else {
+        toast.error("Failed to load inquiries");
+      }
+    } catch {
+      toast.error("Failed to load inquiries");
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { fetchInquiries(); }, [fetchInquiries]);
 
   const updateStatus = async (id: string, s: Inquiry["status"]) => {
     setInquiries(p => p.map(i => i.id === id ? { ...i, status: s } : i));
-    try {
-      const sb = createSupabaseBrowserClient();
-      const { error } = await sb.from("inquiries").update({ status: s }).eq("id", id);
-      if (error) throw error;
+    const { error } = await updateInquiryStatus(id, s);
+    if (error) {
+      toast.error("Failed to update status");
+      fetchInquiries();
+    } else {
       toast.success(`Marked as ${s}`);
-    } catch { toast.error("Failed"); fetchInquiries(); }
+    }
   };
 
-  const deleteInquiry = async (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this inquiry?")) return;
     setInquiries(p => p.filter(i => i.id !== id));
     if (selected === id) setSelected(null);
-    try {
-      const sb = createSupabaseBrowserClient();
-      await sb.from("inquiries").delete().eq("id", id);
+    const { error } = await deleteInquiry(id);
+    if (error) {
+      toast.error("Failed to delete inquiry");
+      fetchInquiries();
+    } else {
       toast.success("Deleted");
-    } catch { toast.error("Failed"); fetchInquiries(); }
+    }
   };
 
   const current   = inquiries.find(i => i.id === selected) ?? null;
@@ -84,25 +103,6 @@ export default function InquiriesPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24">
       <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
-
-  if (noSupabase) return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="font-display text-2xl font-bold text-white">Inquiries</h2>
-        <p className="text-white/40 text-sm mt-0.5">Customer contact form submissions</p>
-      </div>
-      <div className="bg-amber-500/8 border border-amber-500/20 rounded-2xl p-6">
-        <h3 className="font-semibold text-amber-400 mb-2 flex items-center gap-2">
-          <MessageSquare size={16} /> Supabase not connected
-        </h3>
-        <p className="text-amber-400/70 text-sm leading-relaxed">
-          Add <code className="bg-amber-500/10 px-1.5 py-0.5 rounded font-mono text-xs">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-          <code className="bg-amber-500/10 px-1.5 py-0.5 rounded font-mono text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>{" "}
-          to your <code className="bg-amber-500/10 px-1.5 py-0.5 rounded font-mono text-xs">.env.local</code> file.
-        </p>
-      </div>
     </div>
   );
 
@@ -182,7 +182,7 @@ export default function InquiriesPage() {
                     </div>
                     <p className="text-[11px] text-white/30 line-clamp-1">{inquiry.message}</p>
                     <div className="flex items-center gap-1 text-[10px] text-white/20 mt-2">
-                      <Clock size={10} /> {fmtDate(inquiry.created_at)} · {fmtTime(inquiry.created_at)}
+                      <Clock size={10} /> {fmtDate(inquiry.createdAt)} · {fmtTime(inquiry.createdAt)}
                     </div>
                   </motion.button>
                 ))}
@@ -215,7 +215,7 @@ export default function InquiriesPage() {
                           {STATUS[current.status]?.label}
                         </span>
                         <span className="text-[11px] text-white/25">
-                          {fmtDate(current.created_at)} at {fmtTime(current.created_at)}
+                          {fmtDate(current.createdAt)} at {fmtTime(current.createdAt)}
                         </span>
                       </div>
                     </div>
@@ -232,7 +232,7 @@ export default function InquiriesPage() {
                           <Check size={15} />
                         </button>
                       )}
-                      <button onClick={() => deleteInquiry(current.id)}
+                      <button onClick={() => handleDelete(current.id)}
                         className="p-2 text-red-400/40 hover:text-red-400 hover:bg-red-500/8 rounded-lg transition-colors" title="Delete">
                         <Trash2 size={15} />
                       </button>
@@ -262,8 +262,8 @@ export default function InquiriesPage() {
                       <p className="text-sm text-white/80 font-medium capitalize">
                         {current.subject.replace(/-/g, " ")}
                       </p>
-                      {current.product_name && (
-                        <p className="text-xs text-gold/60 mt-1">Product: {current.product_name}</p>
+                      {current.productName && (
+                        <p className="text-xs text-gold/60 mt-1">Product: {current.productName}</p>
                       )}
                     </div>
 

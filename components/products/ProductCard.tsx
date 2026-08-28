@@ -3,18 +3,23 @@
 import Link from "next/link";
 import { MessageCircle, Heart, GitCompare, Maximize2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { siteSettings } from "@/lib/data";
+import { cn, buildProductWhatsAppMessage } from "@/lib/utils";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
 import QuickView from "@/components/ui/QuickView";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const defaultSiteSettings = {
+  whatsapp: "",
+};
 
 interface Product {
   id: string;
   name: string;
   slug: string;
   category: string;
+  modelNumber?: string;
   description?: string;
   shortDescription?: string;
   short_description?: string;
@@ -38,6 +43,15 @@ export default function ProductCard({ product }: { product: Product }) {
   const { add, remove, isInWishlist } = useWishlist();
   const { add: addCompare, remove: removeCompare, isInCompare, items: compareItems } = useCompare();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const inWishlist = isInWishlist(product.id);
   const inCompare  = isInCompare(product.id);
@@ -46,9 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const isNew = product.isNew || product.is_new;
   const badge = product.badge;
 
-  const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}". Could you please provide more details?`
-  );
+  const whatsappMessage = encodeURIComponent(buildProductWhatsAppMessage(product));
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
@@ -145,7 +157,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        {/* ── Content ── */}
+        {/* Content */}
         <div className="p-4">
           {/* Category tag */}
           <div className="text-[9px] text-gold/70 font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
@@ -154,9 +166,16 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Name */}
-          <h3 className="font-semibold text-white text-sm mb-1.5 line-clamp-2 group-hover:text-gold transition-colors duration-200 leading-snug">
+          <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-gold transition-colors duration-200 leading-snug">
             <Link href={`/products/${product.slug}`}>{product.name}</Link>
           </h3>
+
+          {/* Model Number */}
+          {product.modelNumber && (
+            <div className="text-[10px] text-white/25 font-mono mb-1.5">
+              Model: {product.modelNumber}
+            </div>
+          )}
 
           {/* Short description */}
           <p className="text-[11px] text-brand-text/60 font-light line-clamp-2 mb-4 leading-relaxed">

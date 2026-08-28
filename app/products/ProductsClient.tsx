@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X, Grid, List, Package } from "lucide-react";
-import { products as staticProducts, categories as staticCategories } from "@/lib/data";
 import ProductCard from "@/components/products/ProductCard";
+import { SkeletonGrid } from "@/components/ui/SkeletonCard";
+import { Product, Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export default function ProductsClient() {
@@ -14,10 +15,32 @@ export default function ProductsClient() {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Use static data directly
-  const products = staticProducts;
-  const categories = staticCategories;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/categories"),
+        ]);
+        const productsData = await productsRes.json();
+        const categoriesData = await categoriesRes.json();
+        setProducts(Array.isArray(productsData) ? productsData : []);
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+      } catch (err) {
+        console.error("Failed to fetch products/categories:", err);
+        setProducts([]);
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -44,6 +67,32 @@ export default function ProductsClient() {
     ...categories.map((c) => ({ value: c.slug, label: c.name })),
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-bg">
+        <div className="bg-hero-gradient text-white py-20 relative overflow-hidden border-b border-gold/10">
+          <div className="absolute inset-0 pointer-events-none opacity-20">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-gold blur-3xl" />
+          </div>
+          <div className="container-custom relative z-10">
+            <div className="inline-flex items-center gap-2 bg-gold/15 border border-gold/30 rounded-full px-4.5 py-1.5 mb-4 text-xs font-bold tracking-widest text-gold uppercase">
+              Signature Catalog
+            </div>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-wide">
+              Our Product Collections
+            </h1>
+            <p className="text-gray-300 max-w-2xl font-light text-sm md:text-base leading-relaxed">
+              Browse our complete range of LED lighting, electrical items, and premium bathware.
+            </p>
+          </div>
+        </div>
+        <div className="container-custom py-12">
+          <SkeletonGrid count={8} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-brand-bg">
       <div className="bg-hero-gradient text-white py-20 relative overflow-hidden border-b border-gold/10">
@@ -58,7 +107,7 @@ export default function ProductsClient() {
             Our Product Collections
           </h1>
           <p className="text-gray-300 max-w-2xl font-light text-sm md:text-base leading-relaxed">
-            Browse our complete range of LED lighting, electrical items, and premium bathware — 19 categories, 34+ products.
+            Browse our complete range of LED lighting, electrical items, and premium bathware — {categories.length} categories, {products.length}+ products.
           </p>
         </div>
       </div>

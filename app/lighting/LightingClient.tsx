@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X, Grid, List, SlidersHorizontal, Lightbulb } from "lucide-react";
-import { products as allProducts, categories as allCategories } from "@/lib/data";
 import ProductCard from "@/components/products/ProductCard";
+import { SkeletonGrid } from "@/components/ui/SkeletonCard";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Category, Product } from "@/lib/types";
 
 const LIGHTING_SLUGS = [
   "indoor-lighting", "outdoor-lighting", "commercial-lighting",
   "led-bulbs", "led-tube-lights", "led-ceiling-lights",
   "led-strip-lighting", "led-mirror-lights", "led-step-lights", "electrical-items",
 ];
-
-const lightingCategories = allCategories.filter(c => LIGHTING_SLUGS.includes(c.slug));
-const lightingProducts = allProducts.filter(p => LIGHTING_SLUGS.includes(p.category));
 
 export default function LightingClient() {
   const searchParams = useSearchParams();
@@ -27,6 +25,41 @@ export default function LightingClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/products"),
+        ]);
+        const [catData, prodData] = await Promise.all([
+          catRes.json(),
+          prodRes.json(),
+        ]);
+        setCategories(Array.isArray(catData) ? catData : (catData.data || []));
+        setProducts(Array.isArray(prodData) ? prodData : (prodData.data || []));
+      } catch (error) {
+        console.error("Failed to load categories or products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const lightingCategories = useMemo(
+    () => categories.filter(c => LIGHTING_SLUGS.includes(c.slug)),
+    [categories]
+  );
+
+  const lightingProducts = useMemo(
+    () => products.filter(p => LIGHTING_SLUGS.includes(p.category)),
+    [products]
+  );
 
   const filtered = useMemo(() => {
     let result = lightingProducts;
@@ -40,7 +73,7 @@ export default function LightingClient() {
       );
     }
     return result;
-  }, [selectedCategory, searchQuery]);
+  }, [lightingProducts, selectedCategory, searchQuery]);
 
   const categoryOptions = [
     { value: "all", label: "All Lighting", count: lightingProducts.length },
@@ -51,6 +84,35 @@ export default function LightingClient() {
       count: lightingProducts.filter(p => p.category === c.slug).length,
     })),
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-bg">
+        <div className="bg-hero-gradient text-white py-16 relative overflow-hidden border-b border-gold/10">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-gold/8 blur-[120px]" />
+          </div>
+          <div className="container-custom relative z-10">
+            <div className="w-48 h-4 rounded-full skeleton mb-4" />
+            <div className="w-80 h-12 rounded-full skeleton mb-3" />
+            <div className="w-96 h-5 rounded-full skeleton mb-8" />
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="w-24 h-8 rounded-full skeleton" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="container-custom py-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+            <div className="relative flex-1 max-w-sm w-full h-11 rounded-xl skeleton" />
+            <div className="w-32 h-8 rounded-xl skeleton ml-auto" />
+          </div>
+          <SkeletonGrid count={8} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-bg">

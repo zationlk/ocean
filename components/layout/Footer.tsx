@@ -1,9 +1,39 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram } from "lucide-react";
-import { siteSettings } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const defaultSiteSettings = {
+  address: "",
+  telephone: "",
+  mobile: "",
+  email: "",
+  whatsapp: "",
+  businessHours: {
+    weekdays: "",
+    saturday: "",
+    sunday: "",
+  },
+  socialMedia: {
+    facebook: "",
+    instagram: "",
+  },
+};
 
 export default function Footer() {
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   return (
     <footer className="bg-brand-dark text-white">
       {/* Main footer */}

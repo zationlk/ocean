@@ -1,61 +1,94 @@
-import { NextResponse } from 'next/server'
-import { createSupabaseClient } from '@/lib/supabase'
+import { NextResponse } from 'next/server';
+import { query } from '@/lib/mysql';
+import { revalidateTag } from 'next/cache';
+
+const DEFAULT_SETTINGS = {
+  companyName: 'Ocean Lighting Solutions',
+  tagline: 'Premium Lighting & Bathware',
+  address: '',
+  email: '',
+  website: '',
+  telephone: '',
+  mobile: '',
+  whatsapp: '',
+  businessHours: { weekdays: '', saturday: '', sunday: '' },
+  socialMedia: { facebook: '', instagram: '', youtube: '' },
+  heroTitle: 'Welcome',
+  heroSubtitle: '',
+  aboutText: '',
+  metaDescription: '',
+};
 
 export async function GET() {
-  const supabase = createSupabaseClient()
+  try {
+    const sql = 'SELECT `key`, `value` FROM site_settings';
+    const rows = await query(sql) as any[];
 
-  const { data, error } = await supabase
-    .from('site_settings')
-    .select('*')
+    const settingsMap: Record<string, any> = { ...DEFAULT_SETTINGS };
 
-  if (error) {
-    console.error('Settings fetch error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    for (const row of rows) {
+      try {
+        settingsMap[row.key] = JSON.parse(row.value);
+      } catch {
+        settingsMap[row.key] = row.value;
+      }
+    }
+
+    return NextResponse.json(settingsMap);
+  } catch (error: any) {
+    console.error('Settings fetch error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch settings' }, { status: 500 });
   }
-
-  return NextResponse.json(data || [])
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const supabase = createSupabaseClient()
+    const body = await request.json();
+    const entries = Object.entries(body);
 
-    const { data, error } = await supabase
-      .from('site_settings')
-      .upsert(body, { onConflict: 'key' })
-      .select()
-      .single()
+    const valuesSql = entries.map(() => '(?, ?)').join(', ');
+    const params: any[] = [];
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    for (const [key, val] of entries) {
+      params.push(key);
+      params.push(typeof val === 'object' ? JSON.stringify(val) : String(val));
     }
 
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    const sql = `
+      INSERT INTO site_settings (\`key\`, \`value\`) VALUES ${valuesSql}
+      ON DUPLICATE KEY UPDATE \`value\` = VALUES(\`value\`), updated_at = CURRENT_TIMESTAMP
+    `;
+
+    await query(sql, params);
+    revalidateTag('site-settings');
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Settings POST error:', error);
+    return NextResponse.json({ error: error.message || 'Invalid request body' }, { status: 400 });
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const body = await request.json()
-    const { key, value } = body
-    const supabase = createSupabaseClient()
+    const body = await request.json();
+    const { key, value } = body;
 
-    const { data, error } = await supabase
-      .from('site_settings')
-      .update({ value })
-      .eq('key', key)
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!key) {
+      return NextResponse.json({ error: 'Setting key required' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    const serializedValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+    const sql = `
+      INSERT INTO site_settings (\`key\`, \`value\`) VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE \`value\` = ?, updated_at = CURRENT_TIMESTAMP
+    `;
+
+    await query(sql, [key, serializedValue, serializedValue]);
+    revalidateTag('site-settings');
+    return NextResponse.json({ success: true, data: { key, value } });
+  } catch (error: any) {
+    console.error('Settings PUT error:', error);
+    return NextResponse.json({ error: error.message || 'Invalid request body' }, { status: 400 });
   }
 }

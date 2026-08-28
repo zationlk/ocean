@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { categories, products } from "@/lib/data";
+import { Category, Product } from "@/lib/types";
 
 const LIGHTING_SLUGS = [
   "indoor-lighting", "outdoor-lighting", "commercial-lighting",
@@ -59,6 +60,32 @@ function CategoryCard({ category, count, small = false }: {
 }
 
 export default function CategoriesSection() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/products"),
+        ]);
+        const [catData, prodData] = await Promise.all([
+          catRes.json(),
+          prodRes.json(),
+        ]);
+        setCategories(Array.isArray(catData) ? catData : []);
+        setProducts(Array.isArray(prodData) ? prodData : []);
+      } catch (error) {
+        console.error("Failed to load categories or products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
   const countMap: Record<string, number> = {};
   products.forEach((p) => {
     countMap[p.category] = (countMap[p.category] || 0) + 1;
@@ -66,6 +93,40 @@ export default function CategoriesSection() {
 
   const lightingCategories = categories.filter(c => LIGHTING_SLUGS.includes(c.slug));
   const bathwareCategories = categories.filter(c => !LIGHTING_SLUGS.includes(c.slug));
+
+  if (loading) {
+    return (
+      <section className="section-padding bg-brand-bg relative">
+        <div className="container-custom">
+          <div className="text-center mb-14">
+            <div className="w-40 h-8 mx-auto rounded-full skeleton mb-4" />
+            <div className="w-80 h-10 mx-auto rounded-full skeleton mb-3" />
+            <div className="w-16 h-1 mx-auto skeleton mb-4" />
+            <div className="w-96 h-5 mx-auto rounded-full skeleton" />
+          </div>
+          <div className="space-y-14">
+            <div>
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-brand-border">
+                <div className="w-48 h-8 rounded-full skeleton" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="bg-brand-charcoal border border-brand-border rounded-2xl overflow-hidden animate-pulse">
+                    <div className="h-32 skeleton" />
+                    <div className="p-4 space-y-2">
+                      <div className="h-3 w-full rounded-full skeleton" />
+                      <div className="h-2 w-full rounded-full skeleton" />
+                      <div className="h-2 w-2/3 rounded-full skeleton" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section-padding bg-brand-bg relative">

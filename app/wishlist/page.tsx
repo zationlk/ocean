@@ -1,12 +1,43 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useWishlist } from "@/context/WishlistContext";
 import Link from "next/link";
 import { Heart, X, ShoppingBag, ArrowRight, MessageCircle, Sparkles } from "lucide-react";
-import { siteSettings } from "@/lib/data";
+import { SiteSettings } from "@/lib/types";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+import { formatCategoryName, buildProductWhatsAppMessage } from "@/lib/utils";
+
+const DEFAULT_SETTINGS: SiteSettings = {
+  companyName: "",
+  tagline: "",
+  address: "",
+  email: "",
+  website: "",
+  telephone: "",
+  mobile: "",
+  whatsapp: "",
+  businessHours: { weekdays: "", saturday: "", sunday: "" },
+  socialMedia: { facebook: "", instagram: "", youtube: "" },
+  heroTitle: "",
+  heroSubtitle: "",
+  aboutText: "",
+  metaDescription: "",
+};
 
 export default function WishlistPage() {
   const { items, remove, clear } = useWishlist();
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data: any) => {
+        if (data && !data.error) {
+          setSiteSettings({ ...DEFAULT_SETTINGS, ...data });
+        }
+      })
+      .catch((error) => console.error("Failed to load settings:", error));
+  }, []);
 
   return (
     <div className="min-h-screen bg-brand-obsidian">
@@ -105,7 +136,7 @@ export default function WishlistPage() {
                           View <ArrowRight size={13} />
                         </Link>
                         <a
-                          href={`https://wa.me/${siteSettings.whatsapp}?text=${whatsappMsg}`}
+                          href={`https://wa.me/${siteSettings.whatsapp}?text=${encodeURIComponent(buildProductWhatsAppMessage(item))}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-10 h-10 bg-green-500/10 hover:bg-green-500 border border-green-500/20 hover:border-green-500 rounded-lg flex items-center justify-center transition-all duration-300 group/wa"
@@ -132,7 +163,12 @@ export default function WishlistPage() {
               </div>
               <a
                 href={`https://wa.me/${siteSettings.whatsapp}?text=${encodeURIComponent(
-                  `Hello! I'm interested in the following products:\n${items.map((i) => `• ${i.name}`).join("\n")}\n\nCould you please provide pricing and availability?`
+                  `Hello Ocean Lighting Solutions,\n\nI would like to inquire about the following items from my wishlist:\n\n${items
+                    .map(
+                      (item, idx) =>
+                        `${idx + 1}. ${item.name} (#${item.id || item.slug})\n   📂 Category: ${formatCategoryName(item.category)}\n   🔗 https://www.oceanlighting.lk/products/${item.slug}`
+                    )
+                    .join("\n\n")}\n\nPlease provide pricing, stock availability, and delivery options for these items. Thank you!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

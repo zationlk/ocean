@@ -1,18 +1,35 @@
 "use client";
 
-import { siteSettings } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const defaultSiteSettings = {
+  whatsapp: "",
+};
 
 export default function WhatsAppButton() {
+  const [siteSettings, setSiteSettings] = useState<Record<string, string>>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const message = encodeURIComponent(
-    "Hello! I'm interested in your lighting products. Could you please help me?"
+    `Hello Ocean Lighting Solutions,\n\nI visited your website (www.oceanlighting.lk) and would like to inquire about your products.\n\nCould you please assist me? Thank you!`
   );
+
+  if (!siteSettings.whatsapp) return null;
 
   return (
     <a
       href={`https://wa.me/${siteSettings.whatsapp}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 whatsapp-pulse"
+      className="fixed bottom-6 left-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 whatsapp-pulse"
       aria-label="Chat on WhatsApp"
     >
       <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">

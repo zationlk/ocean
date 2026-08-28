@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Lightbulb, Droplets, Sparkles } from "lucide-react";
-import { products as staticProducts } from "@/lib/data";
+import { Product } from "@/lib/types";
 import ProductCard from "@/components/products/ProductCard";
+import { SkeletonGrid } from "@/components/ui/SkeletonCard";
 import { motion, AnimatePresence } from "framer-motion";
 
 const LIGHTING_SLUGS = new Set([
@@ -21,8 +22,25 @@ const tabs = [
 
 export default function FeaturedProducts() {
   const [activeTab, setActiveTab] = useState<"all"|"lighting"|"bathware">("all");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const featured = staticProducts.filter(p => p.isFeatured);
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products?featured=true");
+        const data = await res.json();
+        setProducts(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load featured products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  const featured = products.filter(p => p.isFeatured);
   const filtered = featured.filter(p => {
     if (activeTab === "all")      return true;
     if (activeTab === "lighting") return LIGHTING_SLUGS.has(p.category);
@@ -78,24 +96,45 @@ export default function FeaturedProducts() {
         </div>
 
         {/* Grid */}
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((product, i) => (
-              <motion.div
-                key={product.id}
-                layout
-                initial={{ opacity: 0, y: 24, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.94 }}
-                transition={{ duration: 0.35, delay: i * 0.04 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden animate-pulse">
+                <div className="h-56 bg-brand-bg skeleton" />
+                <div className="p-5 space-y-3">
+                  <div className="h-3 w-24 rounded-full skeleton" />
+                  <div className="h-4 w-full rounded-full skeleton" />
+                  <div className="h-4 w-3/4 rounded-full skeleton" />
+                  <div className="h-3 w-full rounded-full skeleton" />
+                  <div className="h-3 w-2/3 rounded-full skeleton" />
+                  <div className="flex gap-2 pt-1">
+                    <div className="h-9 flex-1 rounded-lg skeleton" />
+                    <div className="h-9 w-9 rounded-lg skeleton" />
+                  </div>
+                </div>
+              </div>
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        ) : (
+          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filtered.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  layout
+                  initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94 }}
+                  transition={{ duration: 0.35, delay: i * 0.04 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <p className="text-center text-brand-text/50 py-16 font-light">No featured products in this category yet.</p>
         )}
       </div>

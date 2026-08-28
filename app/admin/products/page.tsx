@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Search, Edit, Trash2, Eye, Star, Package, X, Filter, ToggleLeft, ToggleRight, AlertCircle } from "lucide-react";
-import { products as staticProducts, categories } from "@/lib/data";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { Plus, Search, Edit, Trash2, Eye, Star, Package, X, Filter, ToggleLeft, ToggleRight } from "lucide-react";
+import { Category } from "@/lib/types";
 import { deleteProduct, toggleFeatured, toggleNew } from "@/lib/admin-actions";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -26,7 +25,6 @@ function normalise(p: Product): Product {
   };
 }
 
-// Confirmation modal
 function ConfirmModal({ name, onConfirm, onCancel }: { name: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <motion.div
@@ -63,35 +61,42 @@ function ConfirmModal({ name, onConfirm, onCancel }: { name: string; onConfirm: 
 
 export default function AdminProductsPage() {
   const [products,     setProducts]     = useState<Product[]>([]);
+  const [categories,   setCategories]   = useState<Category[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState("");
   const [catFilter,    setCatFilter]    = useState("all");
   const [deletingId,   setDeletingId]   = useState<string | null>(null);
   const [confirmItem,  setConfirmItem]  = useState<Product | null>(null);
   const [togglingId,   setTogglingId]   = useState<string | null>(null);
-  const [supabaseOk,   setSupabaseOk]   = useState(true);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const sb = createSupabaseBrowserClient();
-      const { data, error } = await sb.from("products").select("*").order("created_at", { ascending: false });
-      if (!error && data?.length) {
-        setProducts(data.map(normalise));
-        setSupabaseOk(true);
+      const [productsRes, categoriesRes] = await Promise.all([
+        fetch("/api/products"),
+        fetch("/api/categories"),
+      ]);
+
+      if (productsRes.ok) {
+        const data = await productsRes.json();
+        setProducts(Array.isArray(data) ? data.map(normalise) : []);
       } else {
-        setProducts((staticProducts as unknown as Product[]).map(normalise));
-        setSupabaseOk(false);
+        toast.error("Failed to load products");
+      }
+
+      if (categoriesRes.ok) {
+        const data = await categoriesRes.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } else {
+        toast.error("Failed to load categories");
       }
     } catch {
-      setProducts((staticProducts as unknown as Product[]).map(normalise));
-      setSupabaseOk(false);
+      toast.error("Failed to load data");
     } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // ── Delete ──
   const handleDeleteConfirm = async () => {
     if (!confirmItem) return;
     const { id, name } = confirmItem;
@@ -100,13 +105,7 @@ export default function AdminProductsPage() {
 
     const { error } = await deleteProduct(id);
     if (error) {
-      if (!supabaseOk) {
-        // Static data mode — remove from local state
-        setProducts(p => p.filter(x => x.id !== id));
-        toast.success("Product removed");
-      } else {
-        toast.error("Failed to delete: " + error);
-      }
+      toast.error("Failed to delete: " + error);
     } else {
       setProducts(p => p.filter(x => x.id !== id));
       toast.success(`"${name}" deleted`);
@@ -114,32 +113,29 @@ export default function AdminProductsPage() {
     setDeletingId(null);
   };
 
-  // ── Toggle Featured ──
   const handleToggleFeatured = async (product: Product) => {
     setTogglingId(product.id);
     const newVal = !product.isFeatured;
 
-    // Optimistic
     setProducts(p => p.map(x => x.id === product.id ? { ...x, isFeatured: newVal } : x));
 
     const { error } = await toggleFeatured(product.id, !!product.isFeatured);
-    if (error && supabaseOk) {
+    if (error) {
       toast.error("Failed to update");
-      setProducts(p => p.map(x => x.id === product.id ? { ...x, isFeatured: !newVal } : x)); // revert
+      setProducts(p => p.map(x => x.id === product.id ? { ...x, isFeatured: !newVal } : x));
     } else {
       toast.success(newVal ? "Marked as Featured" : "Removed from Featured");
     }
     setTogglingId(null);
   };
 
-  // ── Toggle New ──
   const handleToggleNew = async (product: Product) => {
     setTogglingId(product.id);
     const newVal = !product.isNew;
     setProducts(p => p.map(x => x.id === product.id ? { ...x, isNew: newVal } : x));
 
     const { error } = await toggleNew(product.id, !!product.isNew);
-    if (error && supabaseOk) {
+    if (error) {
       toast.error("Failed to update");
       setProducts(p => p.map(x => x.id === product.id ? { ...x, isNew: !newVal } : x));
     } else {
@@ -169,15 +165,11 @@ export default function AdminProductsPage() {
       </AnimatePresence>
 
       <div className="space-y-5">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl font-bold text-white">Products</h2>
             <p className="text-white/30 text-sm mt-0.5">
               {products.length} products
-              {!supabaseOk && (
-                <span className="ml-2 text-amber-400/70 text-xs">· static data mode</span>
-              )}
             </p>
           </div>
           <Link href="/admin/products/new"
@@ -186,14 +178,6 @@ export default function AdminProductsPage() {
           </Link>
         </div>
 
-        {!supabaseOk && (
-          <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-            <AlertCircle size={14} className="text-amber-400 shrink-0" />
-            <p className="text-amber-400/70 text-xs">Running on static data — changes won&apos;t persist. Connect Supabase to enable full CRUD.</p>
-          </div>
-        )}
-
-        {/* Filters */}
         <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <div className="relative flex-1 max-w-xs w-full">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
@@ -220,7 +204,6 @@ export default function AdminProductsPage() {
           </p>
         </div>
 
-        {/* Table */}
         {loading ? (
           <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-16 text-center">
             <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
@@ -253,7 +236,6 @@ export default function AdminProductsPage() {
                   {filtered.map(product => (
                     <tr key={product.id}
                       className={cn("transition-colors group", deletingId === product.id ? "opacity-40 pointer-events-none" : "hover:bg-white/2")}>
-                      {/* Product */}
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#0a0a0c] shrink-0 border border-white/5">
@@ -270,12 +252,10 @@ export default function AdminProductsPage() {
                         </div>
                       </td>
 
-                      {/* Category */}
                       <td className="px-4 py-3.5">
                         <span className="text-xs text-white/40 capitalize">{product.category?.replace(/-/g, " ")}</span>
                       </td>
 
-                      {/* Featured toggle */}
                       <td className="px-4 py-3.5">
                         <button
                           onClick={() => handleToggleFeatured(product)}
@@ -289,7 +269,6 @@ export default function AdminProductsPage() {
                         </button>
                       </td>
 
-                      {/* New toggle */}
                       <td className="px-4 py-3.5">
                         <button
                           onClick={() => handleToggleNew(product)}
@@ -303,14 +282,12 @@ export default function AdminProductsPage() {
                         </button>
                       </td>
 
-                      {/* Badge */}
                       <td className="px-4 py-3.5">
                         {product.badge
                           ? <span className="text-[10px] bg-blue-500/10 text-blue-400 font-semibold px-2 py-0.5 rounded-full border border-blue-500/20">{product.badge}</span>
                           : <span className="text-white/20 text-xs">—</span>}
                       </td>
 
-                      {/* Actions */}
                       <td className="px-5 py-3.5">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/products/${product.slug}`} target="_blank"
@@ -339,7 +316,6 @@ export default function AdminProductsPage() {
               </table>
             </div>
 
-            {/* Footer */}
             <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
               <p className="text-[11px] text-white/20">
                 Showing {filtered.length} of {products.length} products

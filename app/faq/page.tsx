@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import Link from "next/link";
+import { fetchSettingsCached } from "@/lib/settings-cache";
 
 const faqs = [
   { question: "What types of lighting products do you carry?", answer: "We carry a comprehensive range including LED panel lights, chandeliers, pendant lights, track lighting, outdoor flood lights, solar garden lights, LED strip lights, industrial high bay lights, and much more. We also stock electrical items like MCB distribution boards and interior solutions." },
@@ -19,6 +20,13 @@ const faqs = [
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [whatsapp, setWhatsapp] = useState("94779900657");
+
+  useEffect(() => {
+    fetchSettingsCached().then((s: any) => { if (s?.whatsapp) setWhatsapp(s.whatsapp); }).catch(() => {});
+  }, []);
+
+  const waHref = `https://wa.me/${whatsapp}?text=${encodeURIComponent("Hello Ocean Lighting Solutions,\n\nI have a question I couldn't find answered in the FAQ on your website (www.oceanlighting.lk).\n\nCould you please help me? Thank you!")}`;
 
   return (
     <div className="min-h-screen bg-brand-obsidian">
@@ -92,7 +100,7 @@ export default function FAQPage() {
               Contact Us
             </Link>
             <a
-              href="https://wa.me/94779900657"
+              href={waHref}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"

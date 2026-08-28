@@ -1,10 +1,73 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Star, Quote } from "lucide-react";
-import { testimonials } from "@/lib/data";
+import { Testimonial } from "@/lib/types";
 import { motion } from "framer-motion";
 
 export default function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadTestimonials() {
+      try {
+        const res = await fetch("/api/testimonials");
+        const data = await res.json();
+        setTestimonials(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadTestimonials();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="section-padding bg-brand-bg relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        </div>
+        <div className="container-custom relative z-10">
+          <div className="text-center mb-14">
+            <div className="w-32 h-8 mx-auto rounded-full skeleton mb-4" />
+            <div className="w-80 h-10 mx-auto rounded-full skeleton mb-3" />
+            <div className="w-16 h-1 mx-auto skeleton mb-4" />
+            <div className="w-80 h-5 mx-auto rounded-full skeleton" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-brand-charcoal rounded-2xl p-6 border border-brand-border animate-pulse">
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <div key={j} className="w-3.5 h-3.5 rounded-full skeleton" />
+                  ))}
+                </div>
+                <div className="space-y-2 mb-5">
+                  <div className="h-3 w-full rounded-full skeleton" />
+                  <div className="h-3 w-full rounded-full skeleton" />
+                  <div className="h-3 w-5/6 rounded-full skeleton" />
+                  <div className="h-3 w-4/6 rounded-full skeleton" />
+                </div>
+                <div className="h-px bg-gradient-to-r from-gold/20 to-transparent mb-4" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full skeleton" />
+                  <div className="space-y-1.5">
+                    <div className="h-3 w-24 rounded-full skeleton" />
+                    <div className="h-2 w-32 rounded-full skeleton" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="section-padding bg-brand-bg relative overflow-hidden">
       {/* Decorative bg */}

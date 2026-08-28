@@ -5,9 +5,15 @@ import { createPortal } from "react-dom";
 import { X, Check, Phone, Heart, ChevronLeft, ChevronRight, ArrowRight, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { siteSettings } from "@/lib/data";
+import { cn, buildProductWhatsAppMessage } from "@/lib/utils";
 import { useWishlist } from "@/context/WishlistContext";
+
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const defaultSiteSettings = {
+  whatsapp: "",
+  telephone: "",
+};
 
 interface Product {
   id: string;
@@ -37,8 +43,17 @@ const WA_ICON = (
 function QuickViewModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const [activeImage, setActiveImage] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
   const { add, remove, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   useEffect(() => { setActiveImage(0); setZoomed(false); }, [product.id]);
 
@@ -59,9 +74,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
   }, [handleClose]);
 
   const shortDesc = product.shortDescription || product.short_description || "";
-  const whatsappMsg = encodeURIComponent(
-    `Hello! I'm interested in the "${product.name}". Could you please provide more details and pricing?`
-  );
+  const whatsappMsg = encodeURIComponent(buildProductWhatsAppMessage(product));
   const prevImg = () => { setActiveImage(i => (i - 1 + product.images.length) % product.images.length); setZoomed(false); };
   const nextImg = () => { setActiveImage(i => (i + 1) % product.images.length); setZoomed(false); };
 

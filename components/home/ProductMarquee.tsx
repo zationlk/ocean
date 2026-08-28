@@ -1,7 +1,32 @@
-import { products } from "@/lib/data";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Product } from "@/lib/types";
 import Link from "next/link";
 
 export default function ProductMarquee() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products?limit=12");
+        const data = await res.json();
+        setProducts(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load marquee products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  if (loading) {
+    return <div className="py-10 bg-brand-obsidian border-y border-brand-border" />;
+  }
+
   // Duplicate array for seamless loop
   const items = [...products, ...products];
 

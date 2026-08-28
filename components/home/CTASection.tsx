@@ -3,46 +3,66 @@
 import Link from "next/link";
 import { Phone, MessageCircle, MapPin, ArrowRight, Clock, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { siteSettings } from "@/lib/data";
+import { useRef, useState, useEffect } from "react";
+import { fetchSettingsCached } from "@/lib/settings-cache";
 
-const cards = [
-  {
-    Icon: Phone,
-    title: "Call Us",
-    line1: siteSettings.telephone,
-    line2: siteSettings.mobile,
-    cta: "Call Now",
-    href: `tel:${siteSettings.telephone.replace(/\s/g, "")}`,
-    external: false,
-    color: "gold",
+const defaultSiteSettings = {
+  telephone: "",
+  mobile: "",
+  whatsapp: "",
+  businessHours: {
+    weekdays: "",
+    saturday: "",
+    sunday: "",
   },
-  {
-    Icon: MessageCircle,
-    title: "WhatsApp",
-    line1: "Chat with a consultant",
-    line2: "Quick response guaranteed",
-    cta: "Chat Now",
-    href: `https://wa.me/${siteSettings.whatsapp}`,
-    external: true,
-    color: "green",
-  },
-  {
-    Icon: MapPin,
-    title: "Visit Showroom",
-    line1: "591, Chilaw Road",
-    line2: "Kattuwa, Negombo",
-    cta: "Get Directions",
-    href: "/contact",
-    external: false,
-    color: "gold",
-  },
-] as const;
+};
 
 export default function CTASection() {
   const ref = useRef<HTMLElement>(null);
+  const [siteSettings, setSiteSettings] = useState<any>(defaultSiteSettings);
+  const [isLoading, setIsLoading] = useState(true);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data) => setSiteSettings(data))
+      .catch((err) => console.error("Failed to fetch settings:", err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const cards = [
+    {
+      Icon: Phone,
+      title: "Call Us",
+      line1: siteSettings.telephone,
+      line2: siteSettings.mobile,
+      cta: "Call Now",
+      href: `tel:${siteSettings.telephone.replace(/\s/g, "")}`,
+      external: false,
+      color: "gold",
+    },
+    {
+      Icon: MessageCircle,
+      title: "WhatsApp",
+      line1: "Chat with a consultant",
+      line2: "Quick response guaranteed",
+      cta: "Chat Now",
+      href: `https://wa.me/${siteSettings.whatsapp}`,
+      external: true,
+      color: "green",
+    },
+    {
+      Icon: MapPin,
+      title: "Visit Showroom",
+      line1: "591, Chilaw Road",
+      line2: "Kattuwa, Negombo",
+      cta: "Get Directions",
+      href: "/contact",
+      external: false,
+      color: "gold",
+    },
+  ] as const;
 
   return (
     <section ref={ref} className="relative py-24 overflow-hidden">
@@ -174,15 +194,17 @@ export default function CTASection() {
         <div className="border-t border-brand-border/50 pt-8">
           <div className="flex flex-wrap justify-center items-center gap-5 md:gap-10">
             {[
-              { text: siteSettings.businessHours.weekdays, active: true },
-              { text: siteSettings.businessHours.saturday, active: true },
-              { text: siteSettings.businessHours.sunday, active: false },
-            ].map(({ text, active }) => (
-              <div key={text} className={`flex items-center gap-2 text-sm ${active ? "text-brand-text/60" : "text-brand-text/30"}`}>
-                <Clock size={13} className={active ? "text-gold" : "text-brand-text/20"} />
-                <span className="font-light">{text}</span>
-              </div>
-            ))}
+              { text: siteSettings.businessHours?.weekdays, active: true },
+              { text: siteSettings.businessHours?.saturday, active: true },
+              { text: siteSettings.businessHours?.sunday, active: false },
+            ]
+              .filter(({ text }) => text && typeof text === "string" && text.trim().length > 0)
+              .map(({ text, active }) => (
+                <div key={text} className={`flex items-center gap-2 text-sm ${active ? "text-brand-text/60" : "text-brand-text/30"}`}>
+                  <Clock size={13} className={active ? "text-gold" : "text-brand-text/20"} />
+                  <span className="font-light">{text}</span>
+                </div>
+              ))}
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ export interface Product {
   slug: string;
   category: string;
   subcategory?: string;
+  modelNumber?: string;
   description: string;
   shortDescription: string;
   images: string[];
@@ -20,10 +21,13 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  mainCategory: string;
+  main_category?: string;
   description: string;
   icon: string;
   image: string;
   productCount?: number;
+  product_count?: number;
 }
 
 export interface Testimonial {
@@ -62,6 +66,8 @@ export interface Brand {
   name: string;
   logo: string;
   website?: string;
+  sort_order?: number;
+  sortOrder?: number;
 }
 
 export interface SiteSettings {

@@ -1,15 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles } from "lucide-react";
-import { siteSettings } from "@/lib/data";
 import toast from "react-hot-toast";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { createInquiry } from "@/lib/admin-actions";
+import { SiteSettings } from "@/lib/types";
+import { fetchSettingsCached } from "@/lib/settings-cache";
+
+const DEFAULT_SETTINGS: SiteSettings = {
+  companyName: "",
+  tagline: "",
+  address: "",
+  email: "",
+  website: "",
+  telephone: "",
+  mobile: "",
+  whatsapp: "",
+  businessHours: { weekdays: "", saturday: "", sunday: "" },
+  socialMedia: { facebook: "", instagram: "", youtube: "" },
+  heroTitle: "",
+  heroSubtitle: "",
+  aboutText: "",
+  metaDescription: "",
+};
 
 export default function ContactClient() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    fetchSettingsCached()
+      .then((data: any) => {
+        if (data && !data.error) {
+          setSiteSettings({ ...DEFAULT_SETTINGS, ...data });
+        }
+      })
+      .catch((error) => console.error("Failed to load settings:", error))
+      .finally(() => setLoadingSettings(false));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,8 +50,7 @@ export default function ContactClient() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { error } = await supabase.from("inquiries").insert({
+      const result = await createInquiry({
         name: formData.name,
         email: formData.email,
         phone: formData.phone || null,
@@ -28,7 +58,7 @@ export default function ContactClient() {
         message: formData.message,
         status: "unread",
       });
-      if (error) {
+      if (result.error) {
         toast.error("Failed to send message. Please try again.");
         return;
       }
@@ -43,10 +73,10 @@ export default function ContactClient() {
   };
 
   const infoCards = [
-    { icon: MapPin, title: "Visit Our Showroom", lines: [siteSettings.address], href: undefined as string | undefined },
-    { icon: Phone, title: "Call Us", lines: [siteSettings.telephone, siteSettings.mobile], href: `tel:${siteSettings.telephone.replace(/\s/g, "")}` },
-    { icon: Mail, title: "Email Us", lines: [siteSettings.email], href: `mailto:${siteSettings.email}` },
-    { icon: Clock, title: "Business Hours", lines: [siteSettings.businessHours.weekdays, siteSettings.businessHours.saturday, siteSettings.businessHours.sunday], href: undefined as string | undefined },
+    { icon: MapPin, title: "Visit Our Showroom", lines: loadingSettings ? [""] : [siteSettings.address], href: undefined as string | undefined },
+    { icon: Phone, title: "Call Us", lines: loadingSettings ? ["", ""] : [siteSettings.telephone, siteSettings.mobile], href: loadingSettings ? undefined : `tel:${siteSettings.telephone.replace(/\s/g, "")}` },
+    { icon: Mail, title: "Email Us", lines: loadingSettings ? [""] : [siteSettings.email], href: loadingSettings ? undefined : `mailto:${siteSettings.email}` },
+    { icon: Clock, title: "Business Hours", lines: loadingSettings ? ["", "", ""] : [siteSettings.businessHours.weekdays, siteSettings.businessHours.saturday, siteSettings.businessHours.sunday], href: undefined as string | undefined },
   ];
 
   const inputClass = "w-full px-4 py-3 bg-brand-obsidian text-white border border-brand-border rounded-xl text-sm outline-none transition-all focus:border-gold focus:ring-2 focus:ring-gold/10 placeholder:text-brand-text/30";
@@ -82,9 +112,9 @@ export default function ContactClient() {
                     <h3 className="font-semibold text-white mb-1 text-sm">{item.title}</h3>
                     {item.lines.map((line, i) =>
                       item.href ? (
-                        <a key={i} href={item.href} className="block text-sm text-brand-text hover:text-gold transition-colors font-light">{line}</a>
+                        <a key={i} href={item.href} className="block text-sm text-brand-text hover:text-gold transition-colors font-light">{line || "\u00A0"}</a>
                       ) : (
-                        <p key={i} className="text-sm text-brand-text font-light">{line}</p>
+                        <p key={i} className="text-sm text-brand-text font-light">{line || "\u00A0"}</p>
                       )
                     )}
                   </div>
@@ -92,7 +122,7 @@ export default function ContactClient() {
               </div>
             ))}
             <a
-              href={`https://wa.me/${siteSettings.whatsapp}`}
+              href={`https://wa.me/${siteSettings.whatsapp}?text=${encodeURIComponent("Hello Ocean Lighting Solutions,\n\nI found your contact page at www.oceanlighting.lk and would like to get in touch.\n\nPlease assist me. Thank you!")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white font-semibold p-5 rounded-2xl transition-all duration-300 hover:shadow-lg"
@@ -177,7 +207,7 @@ export default function ContactClient() {
             <div className="mt-6 bg-brand-charcoal rounded-2xl border border-brand-border overflow-hidden">
               <div className="p-5 border-b border-brand-border">
                 <h3 className="font-semibold text-white mb-1">Find Us on the Map</h3>
-                <p className="text-sm text-brand-text font-light">{siteSettings.address}</p>
+                <p className="text-sm text-brand-text font-light">{siteSettings.address || "\u00A0"}</p>
               </div>
               <div className="h-64 bg-brand-obsidian">
                 <iframe
