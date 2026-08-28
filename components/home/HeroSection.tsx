@@ -262,7 +262,7 @@ export default function HeroSection() {
                       <ArrowRight size={18} className="relative group-hover:translate-x-1.5 transition-transform" />
                     </Link>
 
-                    <a href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
+                    <a href={`tel:${siteSettings.telephone?.replace(/\s/g, "") || ""}`}
                       className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/15 hover:border-gold/30 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300"
                     >
                       <Phone size={17} className="text-gold" />

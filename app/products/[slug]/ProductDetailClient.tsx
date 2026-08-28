@@ -101,7 +101,7 @@ export default function ProductDetailClient({ product, related }: Props) {
             <Link href="/lighting" className="hover:text-gold transition-colors">Products</Link>
             <ChevronRight size={12} className="text-brand-text/30" />
             <Link href={`/lighting?category=${product.category}`} className="hover:text-gold transition-colors capitalize">
-              {product.category.replace(/-/g, " ")}
+              {product.category?.replace(/-/g, " ")}
             </Link>
             <ChevronRight size={12} className="text-brand-text/30" />
             <span className="text-white font-medium truncate max-w-[180px]">{product.name}</span>
@@ -125,7 +125,7 @@ export default function ProductDetailClient({ product, related }: Props) {
               onClick={() => setZoomed(true)}
             >
               <img
-                src={product.images[activeImage]}
+                src={product.images?.[activeImage] || "/logo.png"}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
@@ -146,7 +146,7 @@ export default function ProductDetailClient({ product, related }: Props) {
             </div>
 
             {/* Thumbnails */}
-            {product.images.length > 1 && (
+            {product.images?.length > 1 && (
               <div className="flex gap-2.5">
                 {product.images.map((img, i) => (
                   <button
@@ -169,7 +169,7 @@ export default function ProductDetailClient({ product, related }: Props) {
           {/* ── Info ── */}
           <div>
             <div className="text-xs text-gold font-bold uppercase tracking-widest mb-3">
-              {product.category.replace(/-/g, " ")}
+              {product.category?.replace(/-/g, " ")}
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-white mb-2 leading-snug">
               {product.name}
@@ -349,7 +349,7 @@ export default function ProductDetailClient({ product, related }: Props) {
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-3">
-                    <div className="text-[10px] text-gold font-bold uppercase tracking-wider mb-0.5">{item.category.replace(/-/g, " ")}</div>
+                    <div className="text-[10px] text-gold font-bold uppercase tracking-wider mb-0.5">{item.category?.replace(/-/g, " ")}</div>
                     <div className="text-sm text-white font-medium line-clamp-2 group-hover:text-gold transition-colors leading-snug">{item.name}</div>
                   </div>
                 </Link>
@@ -366,12 +366,12 @@ export default function ProductDetailClient({ product, related }: Props) {
             <X size={20} />
           </button>
           <img
-            src={product.images[activeImage]}
+            src={product.images?.[activeImage] || "/logo.png"}
             alt={product.name}
             className="max-w-full max-h-[90vh] object-contain rounded-xl"
             onClick={(e) => e.stopPropagation()}
           />
-          {product.images.length > 1 && (
+          {product.images?.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
               {product.images.map((_, i) => (
                 <button

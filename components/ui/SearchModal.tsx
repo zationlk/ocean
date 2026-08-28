@@ -195,7 +195,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     >
                       <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-brand-obsidian">
                         <img
-                          src={product.images[0]}
+                          src={product.images?.[0] || "/logo.png"}
                           alt={product.name}
                           className="w-full h-full object-cover"
                           loading="lazy"
@@ -206,7 +206,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                           {product.name}
                         </div>
                         <div className="text-xs text-brand-text/60 capitalize">
-                          {product.category.replace(/-/g, " ")}
+                          {product.category?.replace(/-/g, " ")}
                         </div>
                       </div>
                       <ArrowRight size={14} className="text-brand-text/30 group-hover:text-gold shrink-0" />

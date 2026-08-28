@@ -38,7 +38,7 @@ export default function CTASection() {
       line1: siteSettings.telephone,
       line2: siteSettings.mobile,
       cta: "Call Now",
-      href: `tel:${siteSettings.telephone.replace(/\s/g, "")}`,
+      href: `tel:${siteSettings.telephone?.replace(/\s/g, "") || ""}`,
       external: false,
       color: "gold",
     },

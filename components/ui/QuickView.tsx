@@ -123,7 +123,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImage}
-                  src={product.images[activeImage]}
+                  src={product.images?.[activeImage] || "/logo.png"}
                   alt={product.name}
                   className="w-full h-full object-cover"
                   initial={{ opacity: 0, scale: 1.04 }}
@@ -157,7 +157,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
                 </button>
                 {/* Thumbnails row */}
                 <div className="flex gap-2 p-3 bg-brand-bg overflow-x-auto scrollbar-none">
-                  {product.images.map((img, i) => (
+                  {product.images?.map((img, i) => (
                     <button
                       key={i}
                       onClick={() => { setActiveImage(i); setZoomed(false); }}
@@ -178,7 +178,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
           <div className="flex-1 flex flex-col p-5 sm:p-6 overflow-y-auto">
             {/* Category */}
             <div className="text-[10px] text-gold font-bold uppercase tracking-widest mb-2">
-              {product.category.replace(/-/g, " ")}
+              {product.category?.replace(/-/g, " ")}
             </div>
 
             {/* Name */}
@@ -262,7 +262,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
               </div>
 
               <a
-                href={`tel:${siteSettings.telephone.replace(/\s/g, "")}`}
+                href={`tel:${siteSettings.telephone?.replace(/\s/g, "") || ""}`}
                 className="w-full flex items-center justify-center gap-2 border border-brand-border/60 text-brand-text/50 hover:border-gold/30 hover:text-gold font-medium py-2.5 rounded-2xl transition-all text-xs"
               >
                 <Phone size={12} /> {siteSettings.telephone}
@@ -286,7 +286,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
               <X size={18} />
             </button>
             <motion.img
-              src={product.images[activeImage]}
+              src={product.images?.[activeImage] || "/logo.png"}
               alt={product.name}
               className="max-w-full max-h-[90vh] object-contain rounded-2xl"
               initial={{ scale: 0.9 }}

@@ -18,7 +18,7 @@ export async function GET() {
     return NextResponse.json(categories.map(normalise) || []);
   } catch (error: any) {
     console.error('Categories fetch error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch categories' }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
 

@@ -123,7 +123,7 @@ export default function WishlistPage() {
                     </div>
                     <div className="p-4">
                       <div className="text-xs text-gold font-semibold uppercase tracking-wider mb-1.5">
-                        {item.category.replace(/-/g, " ")}
+                        {item.category?.replace(/-/g, " ")}
                       </div>
                       <h3 className="font-semibold text-white mb-4 line-clamp-2 text-sm group-hover:text-gold transition-colors leading-snug">
                         <Link href={`/products/${item.slug}`}>{item.name}</Link>

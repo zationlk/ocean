@@ -143,7 +143,7 @@ export default function ComparePage() {
                       />
                     </div>
                     <div className="text-xs text-brand-primary font-semibold uppercase tracking-wider mb-1">
-                      {item.category.replace(/-/g, " ")}
+                      {item.category?.replace(/-/g, " ")}
                     </div>
                     <h3 className="font-semibold text-white mb-3 text-sm leading-snug">
                       {item.name}

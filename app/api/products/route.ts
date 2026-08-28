@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     return NextResponse.json(parsedProducts || []);
   } catch (error) {
     console.error('Products fetch error:', error);
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
 

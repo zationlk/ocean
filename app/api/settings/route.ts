@@ -37,7 +37,7 @@ export async function GET() {
     return NextResponse.json(settingsMap);
   } catch (error: any) {
     console.error('Settings fetch error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch settings' }, { status: 500 });
+    return NextResponse.json({ ...DEFAULT_SETTINGS });
   }
 }
 

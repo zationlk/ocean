@@ -74,7 +74,7 @@ export default function ContactClient() {
 
   const infoCards = [
     { icon: MapPin, title: "Visit Our Showroom", lines: loadingSettings ? [""] : [siteSettings.address], href: undefined as string | undefined },
-    { icon: Phone, title: "Call Us", lines: loadingSettings ? ["", ""] : [siteSettings.telephone, siteSettings.mobile], href: loadingSettings ? undefined : `tel:${siteSettings.telephone.replace(/\s/g, "")}` },
+    { icon: Phone, title: "Call Us", lines: loadingSettings ? ["", ""] : [siteSettings.telephone, siteSettings.mobile], href: loadingSettings ? undefined : `tel:${siteSettings.telephone?.replace(/\s/g, "") || ""}` },
     { icon: Mail, title: "Email Us", lines: loadingSettings ? [""] : [siteSettings.email], href: loadingSettings ? undefined : `mailto:${siteSettings.email}` },
     { icon: Clock, title: "Business Hours", lines: loadingSettings ? ["", "", ""] : [siteSettings.businessHours.weekdays, siteSettings.businessHours.saturday, siteSettings.businessHours.sunday], href: undefined as string | undefined },
   ];
