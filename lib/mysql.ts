@@ -8,9 +8,9 @@ const pool = mysql.createPool({
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'ocean_lighting',
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 5,
   queueLimit: 0,
-  ssl: process.env.MYSQL_HOST?.includes('layerbase') || process.env.MYSQL_HOST?.includes('psdb.cloud') ? {
+  ssl: process.env.MYSQL_HOST !== '127.0.0.1' && process.env.MYSQL_HOST !== 'localhost' ? {
     rejectUnauthorized: false
   } : undefined,
   enableKeepAlive: true,
