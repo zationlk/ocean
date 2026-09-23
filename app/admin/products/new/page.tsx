@@ -188,7 +188,7 @@ export default function NewProductPage() {
             <ImagePlus size={15} className="text-gold/60" />
             <h3 className="font-semibold text-white text-sm">Product Images</h3>
           </div>
-          <p className="text-white/25 text-xs">Enter image URLs. Use Unsplash, or upload to Supabase Storage and paste the public URL.</p>
+          <p className="text-white/25 text-xs">Enter image URLs. Use Unsplash, or upload via the Media Library and paste the public URL.</p>
           {images.map((img, i) => (
             <div key={i} className="flex gap-2">
               <input type="url" value={img}

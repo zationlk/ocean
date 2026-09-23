@@ -1,5 +1,4 @@
--- Seed default settings into ocean_lighting site_settings table
-USE ocean_lighting;
+-- Seed default settings into site_settings table
 
 INSERT INTO site_settings (`key`, `value`) VALUES
 ('companyName', '"Ocean Lighting Solutions"'),

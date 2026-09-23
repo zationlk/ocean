@@ -29,10 +29,13 @@ function CategoryCard({ category, count, small = false }: {
     >
       <div className={`relative overflow-hidden ${small ? "h-32" : "h-40"}`}>
         <img
-          src={category.image}
+          src={category.image || "/placeholder-product.jpg"}
           alt={category.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/placeholder-product.jpg";
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/70 via-brand-dark/20 to-transparent" />
         <div className="absolute top-3 right-3 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-xl flex items-center justify-center text-base border border-white/10">

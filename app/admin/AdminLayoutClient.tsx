@@ -115,9 +115,14 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     return <>{children}</>;
   }
 
-  const handleLogout = () => {
-    document.cookie = "admin_session=; path=/; max-age=0";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // ignore
+    }
     router.push("/admin/login");
+    router.refresh();
   };
 
   const currentPage = navItems.find(n => pathname === n.href || pathname.startsWith(n.href + "/"));

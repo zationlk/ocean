@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ArrowRight, Shield } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { motion } from "framer-motion";
 
@@ -12,23 +12,29 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (document.cookie.includes("admin_session=authenticated")) {
-      router.push("/admin/dashboard");
-    }
-  }, [router]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 700));
-    if (formData.email === "admin@oceanlighting.lk" && formData.password === "admin123") {
-      document.cookie = "admin_session=authenticated; path=/; max-age=86400";
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Invalid email or password");
+        setIsLoading(false);
+        return;
+      }
+
       toast.success("Welcome back!");
-      // Small delay so toast renders before navigation
-      setTimeout(() => router.replace("/admin/dashboard"), 800);
-    } else {
-      toast.error("Invalid email or password");
+      setTimeout(() => router.replace("/admin/dashboard"), 600);
+    } catch {
+      toast.error("Network error. Please try again.");
       setIsLoading(false);
     }
   };
@@ -58,7 +64,7 @@ export default function AdminLoginPage() {
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="relative w-full max-w-md"
         >
-          {/* Header — text only, no logo */}
+          {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 mb-5">
               <Lock size={24} className="text-gold" />
@@ -115,15 +121,6 @@ export default function AdminLoginPage() {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                </div>
-
-                {/* Demo hint */}
-                <div className="bg-brand-obsidian border border-gold/15 rounded-xl p-3.5">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Shield size={13} className="text-gold" />
-                    <span className="text-xs font-bold text-gold uppercase tracking-wider">Demo Credentials</span>
-                  </div>
-                  <p className="text-[11px] text-brand-text/50 font-mono">admin@oceanlighting.lk / admin123</p>
                 </div>
 
                 {/* Submit */}

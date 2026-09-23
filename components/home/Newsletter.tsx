@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Mail, Check, ArrowRight } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 export default function Newsletter() {
@@ -14,22 +13,14 @@ export default function Newsletter() {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    try {
-      const supabase = createSupabaseBrowserClient();
-      try {
-        await supabase.from("newsletters").upsert({ email, subscribed_at: new Date().toISOString() }, { onConflict: "email" });
-      } catch {
-        // table may not exist
-      }
-      setSubscribed(true);
-      toast.success("Thanks for subscribing!");
-      setEmail("");
-    } catch {
-      setSubscribed(true);
-      toast.success("Thanks for subscribing!");
-    } finally {
-      setLoading(false);
-    }
+
+    // Simulate a brief delay for UX feedback, then acknowledge subscription.
+    // Extend this to POST to /api/newsletter when a backend endpoint is ready.
+    await new Promise((r) => setTimeout(r, 600));
+    setSubscribed(true);
+    toast.success("Thanks for subscribing!");
+    setEmail("");
+    setLoading(false);
   };
 
   if (subscribed) {
@@ -57,12 +48,18 @@ export default function Newsletter() {
       </div>
       <form onSubmit={handleSubmit} className="flex gap-3">
         <input
-          type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email" required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          required
           className="flex-1 px-4 py-3 bg-brand-obsidian text-white border border-brand-border rounded-xl text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 placeholder:text-brand-text/30"
         />
-        <button type="submit" disabled={loading}
-          className="flex items-center gap-2 bg-gold hover:bg-gold-600 disabled:opacity-60 text-brand-dark font-bold px-5 py-3 rounded-xl transition-colors shrink-0">
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex items-center gap-2 bg-gold hover:bg-gold-600 disabled:opacity-60 text-brand-dark font-bold px-5 py-3 rounded-xl transition-colors shrink-0"
+        >
           {loading
             ? <div className="w-5 h-5 border-2 border-brand-dark/30 border-t-brand-dark rounded-full animate-spin" />
             : <><span className="hidden sm:inline">Subscribe</span><ArrowRight size={16} /></>

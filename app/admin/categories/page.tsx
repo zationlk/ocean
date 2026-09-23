@@ -242,7 +242,7 @@ export default function AdminCategoriesPage() {
                 <div className="mb-5">
                   <label className={labelCls}>Category Image URL</label>
                   <input type="url" value={form.image} onChange={e => setForm(p => ({ ...p, image: e.target.value }))} placeholder="https://example.com/category-image.jpg" className={inputCls} />
-                  <p className="text-white/20 text-[10px] mt-1">Enter image URL (Unsplash, Supabase Storage, or any public image link)</p>
+                  <p className="text-white/20 text-[10px] mt-1">Enter image URL (Unsplash, Media Library, or any public image link)</p>
                   {form.image && form.image.startsWith("http") && (
                     <div className="mt-3 w-40 h-28 rounded-xl overflow-hidden border border-white/8 bg-brand-obsidian">
                       <img src={form.image} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />

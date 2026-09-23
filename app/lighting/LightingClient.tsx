@@ -56,20 +56,38 @@ export default function LightingClient() {
     [categories]
   );
 
+  const isLightingProduct = (p: Product) => {
+    const main = (p as any).mainCategory ?? (p as any).main_category ?? p.category;
+    if (main === "lighting") return true;
+    if (LIGHTING_SLUGS.includes(p.category)) return true;
+    const sub = (p as any).subcategory;
+    if (sub && LIGHTING_SLUGS.includes(sub)) return true;
+    return false;
+  };
+
+  const matchesSubcategory = (p: Product, slug: string) => {
+    if (slug === "all") return true;
+    const sub = (p as any).subcategory;
+    return p.category === slug || sub === slug;
+  };
+
   const lightingProducts = useMemo(
-    () => products.filter(p => LIGHTING_SLUGS.includes(p.category)),
+    () => products.filter(isLightingProduct),
     [products]
   );
 
   const filtered = useMemo(() => {
     let result = lightingProducts;
-    if (selectedCategory !== "all") result = result.filter(p => p.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      result = result.filter(p => matchesSubcategory(p, selectedCategory));
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
         p.name.toLowerCase().includes(q) ||
         (p.shortDescription || "").toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
+        p.category.toLowerCase().includes(q) ||
+        ((p as any).subcategory || "").toLowerCase().includes(q)
       );
     }
     return result;
@@ -81,7 +99,7 @@ export default function LightingClient() {
       value: c.slug,
       label: c.name,
       icon: c.icon,
-      count: lightingProducts.filter(p => p.category === c.slug).length,
+      count: lightingProducts.filter(p => matchesSubcategory(p, c.slug)).length,
     })),
   ];
 

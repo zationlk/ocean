@@ -40,11 +40,20 @@ export default function FeaturedProducts() {
     loadProducts();
   }, []);
 
+  const isLighting = (p: Product) => {
+    const main = (p as any).mainCategory ?? (p as any).main_category ?? p.category;
+    if (main === "lighting") return true;
+    if (LIGHTING_SLUGS.has(p.category)) return true;
+    const sub = (p as any).subcategory;
+    if (sub && LIGHTING_SLUGS.has(sub)) return true;
+    return false;
+  };
+
   const featured = products.filter(p => p.isFeatured);
   const filtered = featured.filter(p => {
     if (activeTab === "all")      return true;
-    if (activeTab === "lighting") return LIGHTING_SLUGS.has(p.category);
-    if (activeTab === "bathware") return !LIGHTING_SLUGS.has(p.category);
+    if (activeTab === "lighting") return isLighting(p);
+    if (activeTab === "bathware") return !isLighting(p);
     return true;
   });
 

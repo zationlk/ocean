@@ -55,20 +55,38 @@ export default function BathwareClient() {
     [categories]
   );
 
+  const isBathwareProduct = (p: Product) => {
+    const main = (p as any).mainCategory ?? (p as any).main_category ?? p.category;
+    if (main === "bathware") return true;
+    if (BATHWARE_SLUGS.includes(p.category)) return true;
+    const sub = (p as any).subcategory;
+    if (sub && BATHWARE_SLUGS.includes(sub)) return true;
+    return false;
+  };
+
+  const matchesSubcategory = (p: Product, slug: string) => {
+    if (slug === "all") return true;
+    const sub = (p as any).subcategory;
+    return p.category === slug || sub === slug;
+  };
+
   const bathwareProducts = useMemo(
-    () => products.filter(p => BATHWARE_SLUGS.includes(p.category)),
+    () => products.filter(isBathwareProduct),
     [products]
   );
 
   const filtered = useMemo(() => {
     let r = bathwareProducts;
-    if (selectedCategory !== "all") r = r.filter(p => p.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      r = r.filter(p => matchesSubcategory(p, selectedCategory));
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       r = r.filter(p =>
         p.name.toLowerCase().includes(q) ||
         (p.shortDescription || "").toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
+        p.category.toLowerCase().includes(q) ||
+        ((p as any).subcategory || "").toLowerCase().includes(q)
       );
     }
     return r;
@@ -78,7 +96,7 @@ export default function BathwareClient() {
     { value:"all", label:"All Bathware", icon:"🚿", count: bathwareProducts.length },
     ...bathwareCategories.map(c => ({
       value: c.slug, label: c.name, icon: c.icon,
-      count: bathwareProducts.filter(p => p.category === c.slug).length,
+      count: bathwareProducts.filter(p => matchesSubcategory(p, c.slug)).length,
     })),
   ];
 

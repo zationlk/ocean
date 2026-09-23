@@ -78,33 +78,31 @@ export default function AdminMediaPage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    let successCount = 0;
     for (const file of Array.from(files)) {
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const dataUrl = ev.target?.result as string;
-        const payload = {
-          filename: file.name,
-          original_name: file.name,
-          filepath: `/uploads/${file.name}`,
-          url: dataUrl,
-          mime_type: file.type,
-          size: file.size,
-          width: 0,
-          height: 0,
-          caption: "",
-          alt_text: "",
-        };
-        const { data, error } = await createMedia(payload);
-        if (error) {
-          toast.error("Failed to upload: " + file.name);
-        } else if (data) {
-          setImages(p => [normalise(data), ...p]);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const json = await res.json();
+        if (res.ok && json.data) {
+          setImages(p => [normalise(json.data), ...p]);
+          successCount++;
+        } else {
+          toast.error(json.error || `Failed to upload: ${file.name}`);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch {
+        toast.error(`Failed to upload: ${file.name}`);
+      }
     }
 
-    toast.success(`${files.length} file(s) uploaded`);
+    if (successCount > 0) {
+      toast.success(`${successCount} file(s) uploaded successfully`);
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 

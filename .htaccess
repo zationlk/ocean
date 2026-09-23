@@ -1,0 +1,7 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/oceaymqu/ocean-lighting"
+PassengerBaseURI "/"
+PassengerNodejs "/home/oceaymqu/nodevenv/ocean-lighting/20/bin/node"
+PassengerAppType node
+PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END

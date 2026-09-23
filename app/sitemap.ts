@@ -1,11 +1,18 @@
 import { query } from "@/lib/mysql"
 
+export const revalidate = 3600; // Regenerate sitemap every hour
+
+const LIGHTING_SLUGS = new Set([
+  "indoor-lighting", "outdoor-lighting", "commercial-lighting",
+  "led-bulbs", "led-tube-lights", "led-ceiling-lights",
+  "led-strip-lighting", "led-mirror-lights", "led-step-lights", "electrical-items",
+]);
+
 export default async function sitemap() {
   const baseUrl = "https://www.oceanlighting.lk"
 
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
-    { url: `${baseUrl}/products`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${baseUrl}/lighting`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${baseUrl}/bathware`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${baseUrl}/projects`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
@@ -30,13 +37,17 @@ export default async function sitemap() {
         }))
       : []
 
+    // Map categories to the correct catalogue URL (/lighting or /bathware)
     const categoryUrls = Array.isArray(categories)
-      ? categories.map((category) => ({
-          url: `${baseUrl}/products?category=${category.slug}`,
-          lastModified: new Date(category.updated_at || new Date()),
-          changeFrequency: "weekly",
-          priority: 0.7,
-        }))
+      ? categories.map((category) => {
+          const base = LIGHTING_SLUGS.has(category.slug) ? "lighting" : "bathware";
+          return {
+            url: `${baseUrl}/${base}?category=${category.slug}`,
+            lastModified: new Date(category.updated_at || new Date()),
+            changeFrequency: "weekly",
+            priority: 0.7,
+          };
+        })
       : []
 
     return [...staticPages, ...categoryUrls, ...productUrls]

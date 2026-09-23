@@ -1,5 +1,4 @@
 -- Update existing products to have correct category (Main Category: lighting or bathware) and subcategory
-USE ocean_lighting;
 
 -- 1. Lighting Subcategories
 UPDATE products

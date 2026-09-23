@@ -1,5 +1,4 @@
--- Seed Categories, Sample Products, Testimonials, and Brands into ocean_lighting database
-USE ocean_lighting;
+-- Seed Categories, Sample Products, Testimonials, and Brands into database
 
 -- 1. Insert Categories
 INSERT INTO categories (name, slug, main_category, description, icon, image, product_count) VALUES

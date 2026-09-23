@@ -99,6 +99,9 @@ export default function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder-product.jpg";
+            }}
           />
 
           {/* Gradient overlay always visible at bottom */}

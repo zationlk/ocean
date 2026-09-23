@@ -1,6 +1,5 @@
 -- Migration: Add model_number column, update category icons, and seed sample model numbers
 -- Date: 2026-08-28
-USE ocean_lighting;
 
 -- 1. Add model_number column to products table if it doesn't exist
 SET @dbname = DATABASE();

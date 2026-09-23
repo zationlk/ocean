@@ -1,10 +1,6 @@
 -- Ocean Lighting Solutions Database Schema
 -- Run this SQL in your MySQL database to create the required tables
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS ocean_lighting;
-USE ocean_lighting;
-
 -- Categories table
 CREATE TABLE IF NOT EXISTS categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
