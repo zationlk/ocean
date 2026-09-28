@@ -8,6 +8,27 @@ const { spawn } = require('child_process');
 // Change working directory to this application root
 process.chdir(__dirname);
 
+// Load environment variables from .env if present
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  try {
+    const envLines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of envLines) {
+      const match = line.match(/^\s*([^#=]+?)\s*=\s*(.*?)\s*$/);
+      if (match) {
+        const key = match[1].trim();
+        let val = match[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  } catch (e) {}
+}
+
 // Logging helper that writes to both console and a startup log file
 const LOG_FILE = path.join(__dirname, 'startup.log');
 function log(msg) {
@@ -213,6 +234,106 @@ const server = http.createServer(async (req, res) => {
       res.write(`Execution error: ${err.message}</pre></body></html>`);
       res.end();
     });
+    return;
+  }
+
+  // --------------------------------------------------------------------------
+  // Special Endpoint: /sync-db (1-click database importer for production)
+  // --------------------------------------------------------------------------
+  if (parsedUrl.pathname === '/sync-db') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ocean Lighting — Database Sync</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 30px; border: 1px solid #334155; }
+    h1 { color: #38bdf8; margin-top: 0; }
+    pre { background: #020617; color: #a5f3fc; padding: 20px; border-radius: 8px; border: 1px solid #334155; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+    .success { color: #4ade80; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .error { color: #f87171; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .btn { display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold; }
+    .btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗄️ Database Import & Sync</h1>
+    <pre>`);
+
+    try {
+      res.write(`[1/4] Reading database credentials from .env...\n`);
+      const dbHost = process.env.MYSQL_HOST || '127.0.0.1';
+      const dbPort = parseInt(process.env.MYSQL_PORT || '3306');
+      const dbUser = process.env.MYSQL_USER || 'root';
+      const dbPass = process.env.MYSQL_PASSWORD || '';
+      const dbName = process.env.MYSQL_DATABASE || 'ocean_lighting';
+
+      res.write(`      Host: \${dbHost}:\${dbPort}\n`);
+      res.write(`      User: \${dbUser}\n`);
+      res.write(`      Database: \${dbName}\n\n`);
+
+      res.write(`[2/4] Connecting to MySQL server...\n`);
+      const mysql = require('mysql2/promise');
+      const conn = await mysql.createConnection({
+        host: dbHost,
+        port: dbPort,
+        user: dbUser,
+        password: dbPass,
+        database: dbName,
+        multipleStatements: true
+      });
+      res.write(`      ✅ Connected successfully!\n\n`);
+
+      res.write(`[3/4] Reading database/full_production_backup.sql...\n`);
+      const sqlFile = path.join(__dirname, 'database', 'full_production_backup.sql');
+      if (!fs.existsSync(sqlFile)) {
+        throw new Error(`SQL file not found at: \${sqlFile}`);
+      }
+      const sqlContent = fs.readFileSync(sqlFile, 'utf8');
+      res.write(`      File size: \${Math.round(sqlContent.length / 1024)} KB\n`);
+      res.write(`      Executing database statements (tables + seeded data)...\n`);
+      await conn.query(sqlContent);
+      res.write(`      ✅ SQL executed successfully!\n\n`);
+
+      res.write(`[4/4] Verifying imported tables and rows...\n`);
+      const [brands] = await conn.query('SELECT COUNT(*) as count FROM brands');
+      const [categories] = await conn.query('SELECT COUNT(*) as count FROM categories');
+      const [products] = await conn.query('SELECT COUNT(*) as count FROM products');
+      const [settings] = await conn.query('SELECT COUNT(*) as count FROM site_settings');
+      const [testimonials] = await conn.query('SELECT COUNT(*) as count FROM testimonials');
+
+      res.write(`      Brands:        \${brands[0].count}\n`);
+      res.write(`      Categories:    \${categories[0].count}\n`);
+      res.write(`      Products:      \${products[0].count}\n`);
+      res.write(`      Site Settings: \${settings[0].count}\n`);
+      res.write(`      Testimonials:  \${testimonials[0].count}\n`);
+
+      await conn.end();
+
+      res.write(`</pre>
+      <div class="success">🎉 Database successfully imported and seeded!</div>
+      <p style="color: #cbd5e1; margin-top: 10px;">All tables, categories, products, and site settings are now live in your production database.</p>
+      <a class="btn" href="/admin/login">🔐 Go to Admin Login</a>
+      <a class="btn" style="background: #059669; margin-left: 10px;" href="/">🏠 View Website Home</a>
+    </div>
+  </body>
+</html>`);
+      res.end();
+    } catch (err) {
+      res.write(`\n❌ Error: \${err.message}\n\${err.stack || ''}</pre>
+      <div class="error">Database sync encountered an error.</div>
+      <p style="color: #cbd5e1;">Please check your .env database credentials in cPanel File Manager.</p>
+      <a class="btn" href="/">Return to Site</a>
+    </div>
+  </body>
+</html>`);
+      res.end();
+    }
     return;
   }
 
