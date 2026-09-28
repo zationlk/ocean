@@ -99,6 +99,7 @@ function initNext() {
     preparePromise = nextApp.prepare()
       .then(() => {
         isReady = true;
+        startupError = null;
         log('Next.js prepared successfully and is READY for requests!');
       })
       .catch((err) => {
@@ -118,9 +119,102 @@ initNext();
 // ============================================================================
 const port = process.env.PORT || 3000;
 let isInstalling = false;
+let isSyncing = false;
 
 const server = http.createServer(async (req, res) => {
   const parsedUrl = parse(req.url, true);
+
+  // --------------------------------------------------------------------------
+  // Special Endpoint: /sync-build (Downloads and extracts .next from GitHub)
+  // --------------------------------------------------------------------------
+  if (parsedUrl.pathname === '/sync-build') {
+    if (isSyncing) {
+      res.statusCode = 429;
+      res.setHeader('Content-Type', 'text/plain');
+      res.end('Build sync is already in progress. Please wait...');
+      return;
+    }
+
+    isSyncing = true;
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ocean Lighting — Syncing Build</title>
+  <style>
+    body { font-family: monospace; background: #0f172a; color: #f8fafc; padding: 30px; line-height: 1.5; }
+    h1 { color: #38bdf8; }
+    pre { background: #020617; color: #a5f3fc; padding: 20px; border-radius: 8px; border: 1px solid #334155; max-height: 500px; overflow-y: auto; white-space: pre-wrap; }
+    .success { color: #4ade80; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .btn { display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🔄 Syncing .next Build from GitHub...</h1>
+  <pre>`);
+
+    const hasGit = fs.existsSync(path.join(__dirname, '.git'));
+    let syncCmd;
+    if (hasGit) {
+      syncCmd = `git fetch origin main && git checkout origin/main -- .next`;
+    } else {
+      syncCmd = `curl -sL https://codeload.github.com/zationlk/ocean/tar.gz/refs/heads/main | tar -xzf - --strip-components=1 ocean-main/.next`;
+    }
+
+    log(`Running sync command: ${syncCmd}`);
+    res.write(`Executing: ${syncCmd}\n\n`);
+
+    const shell = process.platform === 'win32' ? 'cmd.exe' : '/bin/sh';
+    const shellArgs = process.platform === 'win32' ? ['/c', syncCmd] : ['-c', syncCmd];
+    const child = spawn(shell, shellArgs, { cwd: __dirname });
+
+    child.stdout.on('data', (d) => {
+      res.write(d.toString());
+      log(`[SYNC STDOUT] ${d.toString().trim()}`);
+    });
+    child.stderr.on('data', (d) => {
+      res.write(d.toString());
+      log(`[SYNC STDERR] ${d.toString().trim()}`);
+    });
+
+    child.on('close', (code) => {
+      isSyncing = false;
+      res.write('</pre>');
+      try {
+        fixPermissionsRecursively(path.join(__dirname, '.next'));
+      } catch (e) {}
+
+      const checkFile = path.join(__dirname, '.next', 'server', 'pages-manifest.json');
+      if (fs.existsSync(checkFile)) {
+        log('.next sync successful! Initializing Next.js...');
+        initNext();
+        res.write(`
+          <div class="success">✅ .next production build synced successfully!</div>
+          <p>pages-manifest.json is now verified and present. Next.js is initializing.</p>
+          <a class="btn" href="/">🚀 Launch Ocean Lighting Website</a>
+        </body></html>`);
+      } else {
+        log(`.next sync did not produce pages-manifest.json (exit code ${code})`);
+        res.write(`
+          <div style="color: #ef4444; font-size: 18px; margin-top: 20px;">⚠️ Automated download did not complete (Exit code ${code}).</div>
+          <p>Please upload <strong>next-build.zip</strong> (2.2 MB from your local computer) into <code>/home/oceaymqu/ocean-lighting/</code> via cPanel File Manager and click <strong>Extract</strong>.</p>
+          <a class="btn" href="/">Back to Status</a>
+        </body></html>`);
+      }
+      res.end();
+    });
+
+    child.on('error', (err) => {
+      isSyncing = false;
+      log(`Sync spawn error: ${err.message}`);
+      res.write(`Execution error: ${err.message}</pre></body></html>`);
+      res.end();
+    });
+    return;
+  }
 
   // --------------------------------------------------------------------------
   // Special Endpoint: /install-deps (Allows 1-click install of node_modules directly from browser)
@@ -209,10 +303,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   // --------------------------------------------------------------------------
-  // Scenario A: Startup or module loading failed (e.g. Cannot find module 'next')
+  // Scenario A: Startup or module loading failed (e.g. Cannot find module 'next' or missing .next)
   // --------------------------------------------------------------------------
   if (startupError) {
-    const isNextMissing = String(startupError.message || startupError).includes("Cannot find module 'next'");
+    const errStr = String(startupError.stack || startupError.message || startupError);
+    const isNextMissing = errStr.includes("Cannot find module 'next'");
+    const isBuildMissing = errStr.includes("pages-manifest.json") || errStr.includes(".next");
+
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.end(`<!DOCTYPE html>
@@ -226,7 +323,7 @@ const server = http.createServer(async (req, res) => {
     h1 { color: #ef4444; margin-top: 0; font-size: 24px; }
     p { color: #cbd5e1; font-size: 15px; line-height: 1.6; }
     pre { background: #020617; color: #fca5a5; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5; border: 1px solid #334155; }
-    .btn { display: inline-block; background: #2563eb; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 15px 0; }
+    .btn { display: inline-block; background: #2563eb; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 10px 0; }
     .btn:hover { background: #1d4ed8; }
     .meta { margin-top: 25px; padding-top: 20px; border-top: 1px solid #334155; font-size: 13px; color: #94a3b8; }
   </style>
@@ -234,11 +331,23 @@ const server = http.createServer(async (req, res) => {
 <body>
   <div class="container">
     <h1>⚠️ Application Startup Notice</h1>
+    ${isBuildMissing ? `
+      <div style="background: #1e3a8a; border: 1px solid #3b82f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="color: #60a5fa; margin-top: 0;">📦 Production Build (.next folder) is Missing</h3>
+        <p>The compiled production build files (<code>.next/server/pages-manifest.json</code>) are not present in <code>/home/oceaymqu/ocean-lighting/</code>.</p>
+        <p>Choose either option below to resolve this:</p>
+        <div style="margin: 15px 0;">
+          <a class="btn" href="/sync-build">🚀 1-Click Sync .next Build from GitHub</a>
+        </div>
+        <p style="font-size: 13px; color: #93c5fd; margin-top: 10px;">
+          <strong>Alternative:</strong> Upload <code>next-build.zip</code> (2.2 MB from your local project) into <code>/home/oceaymqu/ocean-lighting/</code> in cPanel File Manager and click <strong>Extract</strong>.
+        </p>
+      </div>
+    ` : ''}
     ${isNextMissing ? `
       <div style="background: #1e3a8a; border: 1px solid #3b82f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <h3 style="color: #60a5fa; margin-top: 0;">📦 Production Dependencies Not Installed Yet</h3>
-        <p>The Node.js server is online and responding, but the <code>next</code> package is not yet installed on this server.</p>
-        <p>Click the button below to automatically install all production packages:</p>
+        <p>The <code>next</code> package is not yet installed on this server.</p>
         <a class="btn" href="/install-deps">🚀 Click Here to Auto-Install Dependencies (1-Click)</a>
         <p style="font-size: 13px; color: #93c5fd;">Or in cPanel: Go to <strong>Setup Node.js App</strong> &rarr; click <strong>Run NPM Install</strong>.</p>
       </div>
