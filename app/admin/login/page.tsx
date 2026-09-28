@@ -32,7 +32,9 @@ export default function AdminLoginPage() {
       }
 
       toast.success("Welcome back!");
-      setTimeout(() => router.replace("/admin/dashboard"), 600);
+      // Use hard navigation so the browser sends the new session cookie
+      // before the middleware runs (soft navigation can race the cookie)
+      setTimeout(() => { window.location.href = "/admin/dashboard"; }, 800);
     } catch {
       toast.error("Network error. Please try again.");
       setIsLoading(false);
