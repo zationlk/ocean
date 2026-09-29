@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/mysql';
+import { safeParseJson } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // GET all projects
 export async function GET() {
@@ -7,11 +11,11 @@ export async function GET() {
     const sql = 'SELECT * FROM projects ORDER BY created_at DESC';
     const projects = await query(sql) as any[];
     
-    // Parse JSON fields
-    const parsedProjects = projects.map(project => ({
+    // Parse JSON fields safely
+    const parsedProjects = (projects || []).map(project => ({
       ...project,
-      highlights: project.highlights ? JSON.parse(project.highlights as string) : [],
-      tags: project.tags ? JSON.parse(project.tags as string) : [],
+      highlights: safeParseJson<string[]>(project.highlights, []),
+      tags: safeParseJson<string[]>(project.tags, []),
     }));
     
     return NextResponse.json(parsedProjects);

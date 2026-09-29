@@ -238,6 +238,97 @@ const server = http.createServer(async (req, res) => {
   }
 
   // --------------------------------------------------------------------------
+  // Special Endpoint: /extract-build (1-click extractor for uploaded next-build.zip)
+  // --------------------------------------------------------------------------
+  if (parsedUrl.pathname === '/extract-build') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ocean Lighting — Extract Build</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 30px; border: 1px solid #334155; }
+    h1 { color: #38bdf8; margin-top: 0; }
+    pre { background: #020617; color: #a5f3fc; padding: 20px; border-radius: 8px; border: 1px solid #334155; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+    .success { color: #4ade80; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .btn { display: inline-block; background: #2563eb; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold; }
+    .btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📦 Extract & Activate .next Build</h1>
+    <pre>`);
+
+    const zipFiles = ['next-build.zip', 'build.zip'].map(f => path.join(__dirname, f)).filter(f => fs.existsSync(f));
+    if (zipFiles.length === 0) {
+      res.write(`❌ Error: Neither 'next-build.zip' nor 'build.zip' was found in ${__dirname}\n\nPlease upload next-build.zip via cPanel File Manager first.\n</pre>
+      <a class="btn" href="/">Return to Site</a>
+    </div></body></html>`);
+      res.end();
+      return;
+    }
+
+    const zipPath = zipFiles[0];
+    const zipName = path.basename(zipPath);
+    res.write(`Found build zip: ${zipName} (${Math.round(fs.statSync(zipPath).size / 1024)} KB)\n`);
+    res.write(`Extracting ${zipName} into ${__dirname}...\n`);
+
+    const extractCmd = process.platform === 'win32'
+      ? `powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${__dirname}' -Force"`
+      : `unzip -o -q "${zipPath}" -d "${__dirname}"`;
+
+    const shell = process.platform === 'win32' ? 'cmd.exe' : '/bin/sh';
+    const shellArgs = process.platform === 'win32' ? ['/c', extractCmd] : ['-c', extractCmd];
+    const child = spawn(shell, shellArgs, { cwd: __dirname });
+
+    child.stdout.on('data', d => res.write(d.toString()));
+    child.stderr.on('data', d => res.write(d.toString()));
+
+    child.on('close', code => {
+      if (code === 0) {
+        res.write(`\n✅ Extraction complete!\n`);
+        res.write(`Verifying and repairing permissions on .next folder...\n`);
+        try {
+          fixPermissionsRecursively(path.join(__dirname, '.next'));
+          res.write(`✅ Permissions set to 755/644.\n`);
+        } catch (e) {
+          res.write(`Notice: ${e.message}\n`);
+        }
+
+        const checkFile = path.join(__dirname, '.next', 'server', 'pages-manifest.json');
+        if (fs.existsSync(checkFile)) {
+          res.write(`✅ Verified: .next/server/pages-manifest.json is present.\n`);
+          log('Re-initializing Next.js with fresh build...');
+          initNext();
+          res.write(`</pre>
+          <div class="success">🎉 New build extracted and activated successfully!</div>
+          <p style="color: #cbd5e1; margin-top: 10px;">Next.js is now running the latest build. You can log into admin or view products now.</p>
+          <a class="btn" href="/admin/login">🔐 Go to Admin Login</a>
+          <a class="btn" style="background: #059669; margin-left: 10px;" href="/">🏠 View Website Home</a>
+        </div></body></html>`);
+        } else {
+          res.write(`\n⚠️ Warning: .next/server/pages-manifest.json not found after extraction.\n</pre>
+          <a class="btn" href="/">Back to Site</a></div></body></html>`);
+        }
+      } else {
+        res.write(`\n❌ Extraction failed with exit code ${code}.\n</pre>
+        <a class="btn" href="/">Back to Site</a></div></body></html>`);
+      }
+      res.end();
+    });
+
+    child.on('error', err => {
+      res.write(`\nExecution error: ${err.message}</pre><a class="btn" href="/">Back to Site</a></div></body></html>`);
+      res.end();
+    });
+    return;
+  }
+
+  // --------------------------------------------------------------------------
   // Special Endpoint: /sync-db (1-click database importer for production)
   // --------------------------------------------------------------------------
   if (parsedUrl.pathname === '/sync-db') {

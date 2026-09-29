@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/mysql';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const parseBrand = (b: any) => ({
   ...b,
   sortOrder: b.sort_order,

@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/mysql';
+import { safeParseJson } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -23,7 +27,7 @@ export async function GET(request: Request) {
     }
     if (featured === 'true') {
       conditions.push('is_featured = ?');
-      params.push(true);
+      params.push(1);
     }
 
     if (conditions.length > 0) {
@@ -34,17 +38,17 @@ export async function GET(request: Request) {
 
     if (limit) {
       sql += ' LIMIT ?';
-      params.push(parseInt(limit));
+      params.push(parseInt(limit, 10));
     }
 
     const products = await query(sql, params) as any[];
 
-    const parsedProducts = products.map(p => ({
+    const parsedProducts = (products || []).map(p => ({
       ...p,
       modelNumber: p.model_number,
-      images: p.images ? JSON.parse(p.images as string) : [],
-      specifications: p.specifications ? JSON.parse(p.specifications as string) : {},
-      features: p.features ? JSON.parse(p.features as string) : [],
+      images: safeParseJson<string[]>(p.images, []),
+      specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
+      features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,
       isNew: !!p.is_new,
       shortDescription: p.short_description,
@@ -56,10 +60,10 @@ export async function GET(request: Request) {
       return NextResponse.json(parsedProducts[0]);
     }
 
-    return NextResponse.json(parsedProducts || []);
-  } catch (error) {
+    return NextResponse.json(parsedProducts);
+  } catch (error: any) {
     console.error('Products fetch error:', error);
-    return NextResponse.json([]);
+    return NextResponse.json({ error: error.message || 'Failed to fetch products', products: [] }, { status: 500 });
   }
 }
 
@@ -81,8 +85,8 @@ export async function POST(request: Request) {
       JSON.stringify(images || []),
       JSON.stringify(specifications || {}),
       JSON.stringify(features || []),
-      is_featured || false,
-      is_new || false,
+      is_featured ? 1 : 0,
+      is_new ? 1 : 0,
       badge || null,
     ];
 
@@ -95,9 +99,9 @@ export async function POST(request: Request) {
     const data = {
       ...p,
       modelNumber: p.model_number,
-      images: p.images ? JSON.parse(p.images as string) : [],
-      specifications: p.specifications ? JSON.parse(p.specifications as string) : {},
-      features: p.features ? JSON.parse(p.features as string) : [],
+      images: safeParseJson<string[]>(p.images, []),
+      specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
+      features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,
       isNew: !!p.is_new,
       shortDescription: p.short_description,
@@ -156,9 +160,9 @@ export async function PUT(request: Request) {
     const data = {
       ...p,
       modelNumber: p.model_number,
-      images: p.images ? JSON.parse(p.images as string) : [],
-      specifications: p.specifications ? JSON.parse(p.specifications as string) : {},
-      features: p.features ? JSON.parse(p.features as string) : [],
+      images: safeParseJson<string[]>(p.images, []),
+      specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
+      features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,
       isNew: !!p.is_new,
       shortDescription: p.short_description,

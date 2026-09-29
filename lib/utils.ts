@@ -97,3 +97,32 @@ I would like to inquire about the following product:
 
 Please provide price details, stock availability, and delivery options. Thank you!`;
 }
+
+/**
+ * Safely parses JSON values from database columns (handles strings, Buffers, already-parsed objects, null/undefined, and malformed strings)
+ */
+export function safeParseJson<T>(value: any, fallback: T): T {
+  if (value === null || value === undefined) return fallback;
+  if (typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
+    try {
+      const str = value.toString('utf8').trim();
+      return str ? JSON.parse(str) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  if (typeof value === 'object') {
+    return value as T;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return fallback;
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
+}
+

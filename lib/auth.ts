@@ -6,6 +6,13 @@ export const SESSION_COOKIE_NAME = 'admin_session';
 const SECRET_KEY = 'ocean-lighting-production-secret-key-2026-secure-random';
 
 function base64UrlEncode(data: Uint8Array | string): string {
+  if (typeof Buffer !== 'undefined') {
+    if (typeof data === 'string') {
+      return Buffer.from(data, 'utf8').toString('base64url');
+    } else {
+      return Buffer.from(data).toString('base64url');
+    }
+  }
   let binary = '';
   if (typeof data === 'string') {
     const bytes = new TextEncoder().encode(data);
@@ -22,6 +29,9 @@ function base64UrlEncode(data: Uint8Array | string): string {
 }
 
 function base64UrlDecode(str: string): string {
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(str, 'base64url').toString('utf8');
+  }
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
   while (base64.length % 4) base64 += '=';
   const binary = atob(base64);
@@ -32,15 +42,13 @@ function base64UrlDecode(str: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-function base64UrlToBytes(str: string): Uint8Array {
-  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-  while (base64.length % 4) base64 += '=';
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
-  return bytes;
+  return diff === 0;
 }
 
 async function getHmacKey(): Promise<CryptoKey> {
@@ -94,23 +102,29 @@ export async function createSessionToken(email: string, role = 'admin'): Promise
 export async function verifySessionToken(token: string | undefined | null): Promise<AdminSessionPayload | null> {
   if (!token || typeof token !== 'string') return null;
 
-  const parts = token.split('.');
+  let cleanToken = token.trim();
+  if (cleanToken.startsWith('"') && cleanToken.endsWith('"')) {
+    cleanToken = cleanToken.slice(1, -1);
+  }
+
+  const parts = cleanToken.split('.');
   if (parts.length !== 2) return null;
 
   const [encodedPayload, encodedSignature] = parts;
+  if (!encodedPayload || !encodedSignature) return null;
 
   try {
     const key = await getHmacKey();
-    const sigBytes = base64UrlToBytes(encodedSignature);
-
-    const isValid = await crypto.subtle.verify(
+    const signatureBuffer = await crypto.subtle.sign(
       'HMAC',
       key,
-      sigBytes.buffer as ArrayBuffer,
       new TextEncoder().encode(encodedPayload)
     );
+    const expectedSignature = base64UrlEncode(new Uint8Array(signatureBuffer));
 
-    if (!isValid) return null;
+    if (!timingSafeEqualStr(expectedSignature, encodedSignature)) {
+      return null;
+    }
 
     const decodedJson = base64UrlDecode(encodedPayload);
     const payload = JSON.parse(decodedJson) as AdminSessionPayload;

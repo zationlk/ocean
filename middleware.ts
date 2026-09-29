@@ -13,7 +13,9 @@ export async function middleware(request: NextRequest) {
       const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
       const session = await verifySessionToken(token);
       if (session) {
-        return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+        const dashUrl = request.nextUrl.clone();
+        dashUrl.pathname = "/admin/dashboard";
+        return NextResponse.redirect(dashUrl);
       }
       return NextResponse.next();
     }
@@ -23,7 +25,8 @@ export async function middleware(request: NextRequest) {
     const session = await verifySessionToken(token);
 
     if (!session) {
-      const loginUrl = new URL("/admin/login", request.url);
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
       loginUrl.searchParams.set("from", pathname);
       const response = NextResponse.redirect(loginUrl);
       // Clean up invalid session cookie if present
