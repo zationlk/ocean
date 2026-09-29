@@ -7,6 +7,7 @@ import { Heart, X, ShoppingBag, ArrowRight, MessageCircle, Sparkles } from "luci
 import { SiteSettings } from "@/lib/types";
 import { fetchSettingsCached } from "@/lib/settings-cache";
 import { formatCategoryName, buildProductWhatsAppMessage } from "@/lib/utils";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 const DEFAULT_SETTINGS: SiteSettings = {
   companyName: "",
@@ -108,10 +109,12 @@ export default function WishlistPage() {
                   >
                     <div className="relative h-48 overflow-hidden bg-brand-obsidian">
                       <img
-                        src={item.image}
+                        src={getProductImage(item.image)}
                         alt={item.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={handleImageFallback}
                       />
                       <button
                         onClick={() => remove(item.id)}

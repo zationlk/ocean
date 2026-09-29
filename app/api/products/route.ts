@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/mysql';
 import { safeParseJson } from '@/lib/utils';
+import { normalizeImageUrl, resolveExternalImageUrl } from '@/lib/image-utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -46,7 +47,7 @@ export async function GET(request: Request) {
     const parsedProducts = (products || []).map(p => ({
       ...p,
       modelNumber: p.model_number,
-      images: safeParseJson<string[]>(p.images, []),
+      images: safeParseJson<string[]>(p.images, []).map(normalizeImageUrl),
       specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
       features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,
@@ -75,6 +76,10 @@ export async function POST(request: Request) {
       images, specifications, features, is_featured, is_new, badge
     } = body;
 
+    const resolvedImages = Array.isArray(images)
+      ? await Promise.all(images.map((img: string) => resolveExternalImageUrl(img)))
+      : [];
+
     const sql = `
       INSERT INTO products (name, slug, category, subcategory, model_number, description, short_description, images, specifications, features, is_featured, is_new, badge)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -82,7 +87,7 @@ export async function POST(request: Request) {
 
     const params = [
       name, slug, category, subcategory || null, model_number || null, description, short_description,
-      JSON.stringify(images || []),
+      JSON.stringify(resolvedImages),
       JSON.stringify(specifications || {}),
       JSON.stringify(features || []),
       is_featured ? 1 : 0,
@@ -99,7 +104,7 @@ export async function POST(request: Request) {
     const data = {
       ...p,
       modelNumber: p.model_number,
-      images: safeParseJson<string[]>(p.images, []),
+      images: safeParseJson<string[]>(p.images, []).map(normalizeImageUrl),
       specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
       features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,
@@ -123,6 +128,12 @@ export async function PUT(request: Request) {
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 });
+    }
+
+    if ('images' in updates && Array.isArray(updates.images)) {
+      updates.images = await Promise.all(
+        updates.images.map((img: string) => resolveExternalImageUrl(img))
+      );
     }
 
     const fields: string[] = [];
@@ -160,7 +171,7 @@ export async function PUT(request: Request) {
     const data = {
       ...p,
       modelNumber: p.model_number,
-      images: safeParseJson<string[]>(p.images, []),
+      images: safeParseJson<string[]>(p.images, []).map(normalizeImageUrl),
       specifications: safeParseJson<Record<string, any>>(p.specifications, {}),
       features: safeParseJson<string[]>(p.features, []),
       isFeatured: !!p.is_featured,

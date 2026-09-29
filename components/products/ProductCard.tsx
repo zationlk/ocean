@@ -9,6 +9,7 @@ import { useCompare } from "@/context/CompareContext";
 import QuickView from "@/components/ui/QuickView";
 import { useState, useEffect } from "react";
 import { fetchSettingsCached } from "@/lib/settings-cache";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 const defaultSiteSettings = {
   whatsapp: "",
@@ -56,7 +57,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const inWishlist = isInWishlist(product.id);
   const inCompare  = isInCompare(product.id);
   const shortDesc  = product.shortDescription || product.short_description || product.description || "";
-  const displayImage = product.images?.[0] || "/placeholder-product.jpg";
+  const displayImage = getProductImage(product.images?.[0]);
   const isNew = product.isNew || product.is_new;
   const badge = product.badge;
 
@@ -99,9 +100,8 @@ export default function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder-product.jpg";
-            }}
+            referrerPolicy="no-referrer"
+            onError={handleImageFallback}
           />
 
           {/* Gradient overlay always visible at bottom */}

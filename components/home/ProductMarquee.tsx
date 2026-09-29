@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Product } from "@/lib/types";
 import Link from "next/link";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 export default function ProductMarquee() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -55,10 +56,12 @@ export default function ProductMarquee() {
             >
               <div className="w-36 h-36 rounded-2xl overflow-hidden border border-brand-border group-hover:border-gold group-hover:shadow-gold-glow transition-all duration-300 bg-brand-charcoal">
                 <img
-                  src={product.images[0]}
+                  src={getProductImage(product.images?.[0])}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
+                  onError={handleImageFallback}
                 />
               </div>
               <p className="mt-2 text-xs text-center text-brand-text font-semibold line-clamp-2 group-hover:text-gold transition-colors leading-snug">

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Category } from "@/lib/types";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 const LIGHTING_SLUGS = new Set([
   "indoor-lighting","outdoor-lighting","commercial-lighting","led-bulbs",
@@ -204,8 +205,13 @@ export default function AdminDashboardPage() {
             ) : products.slice(0, 6).map(product => (
               <div key={product.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/3 transition-colors group">
                 <div className="w-10 h-10 rounded-xl overflow-hidden bg-brand-bg shrink-0">
-                  <img src={product.images?.[0] || ""} alt={product.name} className="w-full h-full object-cover"
-                    onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=80&q=60"; }} />
+                  <img
+                    src={getProductImage(product.images?.[0])}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={handleImageFallback}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-white/80 truncate group-hover:text-white transition-colors">

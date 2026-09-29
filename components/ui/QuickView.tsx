@@ -9,6 +9,7 @@ import { cn, buildProductWhatsAppMessage } from "@/lib/utils";
 import { useWishlist } from "@/context/WishlistContext";
 
 import { fetchSettingsCached } from "@/lib/settings-cache";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 const defaultSiteSettings = {
   whatsapp: "",
@@ -123,13 +124,15 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImage}
-                  src={product.images?.[activeImage] || "/logo.png"}
+                  src={getProductImage(product.images?.[activeImage])}
                   alt={product.name}
                   className="w-full h-full object-cover"
                   initial={{ opacity: 0, scale: 1.04 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
+                  referrerPolicy="no-referrer"
+                  onError={handleImageFallback}
                 />
               </AnimatePresence>
 
@@ -166,7 +169,13 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
                         i === activeImage ? "border-gold shadow-gold-glow" : "border-transparent opacity-50 hover:opacity-100"
                       )}
                     >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={getProductImage(img)}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        onError={handleImageFallback}
+                      />
                     </button>
                   ))}
                 </div>

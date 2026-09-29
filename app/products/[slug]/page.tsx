@@ -2,50 +2,67 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { query } from "@/lib/mysql";
 import { Product } from "@/lib/types";
+import { safeParseJson } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image-utils";
 import ProductDetailClient from "./ProductDetailClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: { slug: string } | Promise<{ slug: string }>;
 }
 
 function normaliseProduct(p: any): Product {
+  const rawImages = safeParseJson<any>(p.images, []);
+  let imagesArray: string[] = [];
+  if (Array.isArray(rawImages)) {
+    imagesArray = rawImages.filter(Boolean).map(normalizeImageUrl);
+  } else if (typeof rawImages === "string" && rawImages.trim()) {
+    imagesArray = [normalizeImageUrl(rawImages.trim())];
+  }
+  if (imagesArray.length === 0) {
+    imagesArray = ["/placeholder-product.jpg"];
+  }
+
+  const rawSpecs = safeParseJson<any>(p.specifications, {});
+  const specifications = (rawSpecs && typeof rawSpecs === "object" && !Array.isArray(rawSpecs)) ? rawSpecs : {};
+
+  const rawFeatures = safeParseJson<any>(p.features, []);
+  const features = Array.isArray(rawFeatures) ? rawFeatures.filter(Boolean) : [];
+
   return {
     ...p,
-    modelNumber: p.model_number,
-    images: p.images ? JSON.parse(p.images) : [],
-    specifications: p.specifications ? JSON.parse(p.specifications) : {},
-    features: p.features ? JSON.parse(p.features) : [],
-    isFeatured: !!p.is_featured,
-    isNew: !!p.is_new,
-    shortDescription: p.short_description,
-    createdAt: p.created_at,
-    updatedAt: p.updated_at,
+    modelNumber: p.model_number || p.modelNumber || "",
+    images: imagesArray,
+    specifications,
+    features,
+    isFeatured: !!(p.is_featured || p.isFeatured),
+    isNew: !!(p.is_new || p.isNew),
+    shortDescription: p.short_description || p.shortDescription || "",
+    description: p.description || "",
+    createdAt: p.created_at || p.createdAt,
+    updatedAt: p.updated_at || p.updatedAt,
   };
 }
 
-async function fetchAllProducts(): Promise<Product[]> {
-  const rows = await query("SELECT * FROM products ORDER BY created_at DESC") as any[];
-  return rows.map(normaliseProduct);
-}
-
 async function fetchProductBySlug(slug: string): Promise<Product | null> {
-  const rows = await query("SELECT * FROM products WHERE slug = ? LIMIT 1", [slug]) as any[];
-  if (rows.length === 0) return null;
-  return normaliseProduct(rows[0]);
-}
-
-export async function generateStaticParams() {
   try {
-    const products = await fetchAllProducts();
-    return products.map((p) => ({ slug: p.slug }));
-  } catch {
-    return [];
+    const rows = await query("SELECT * FROM products WHERE slug = ? LIMIT 1", [slug]) as any[];
+    if (!rows || rows.length === 0) return null;
+    return normaliseProduct(rows[0]);
+  } catch (err) {
+    console.error("Error fetching product by slug:", err);
+    return null;
   }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
   try {
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams?.slug;
+    if (!slug) return { title: "Product Not Found" };
+
     const product = await fetchProductBySlug(slug);
     if (!product) return { title: "Product Not Found" };
 
@@ -85,7 +102,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const resolvedParams = await Promise.resolve(params);
+  const slug = resolvedParams?.slug;
+  if (!slug) notFound();
+
   const product = await fetchProductBySlug(slug);
   if (!product) notFound();
 
@@ -95,8 +115,11 @@ export default async function ProductDetailPage({ params }: Props) {
       "SELECT * FROM products WHERE category = ? AND id != ? ORDER BY created_at DESC LIMIT 4",
       [product.category, product.id]
     ) as any[];
-    related = allRows.map(normaliseProduct);
-  } catch {
+    if (Array.isArray(allRows)) {
+      related = allRows.map(normaliseProduct);
+    }
+  } catch (err) {
+    console.error("Error fetching related products:", err);
     related = [];
   }
 

@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Plus, X, Loader2, ImagePlus, AlertCircle, Star, Sparkl
 import Link from "next/link";
 import { Category } from "@/lib/types";
 import { updateProduct, buildSlug } from "@/lib/admin-actions";
+import { normalizeImageUrl, getProductImage, handleImageFallback } from "@/lib/image-utils";
 import toast from "react-hot-toast";
 
 const inputCls = "w-full px-4 py-3 bg-[#0a0a0c] text-white border border-white/8 rounded-xl text-sm outline-none focus:border-gold/50 focus:ring-2 focus:ring-gold/8 transition-all placeholder:text-white/20";
@@ -179,6 +180,36 @@ export default function EditProductPage() {
   // convenience alias
   const images = form.images;
   const setImages = (imgs: string[]) => setForm(p => ({ ...p, images: imgs }));
+  const [resolvingIndex, setResolvingIndex] = useState<number | null>(null);
+
+  const handleImageChange = async (index: number, rawVal: string) => {
+    let val = rawVal.trim();
+    val = normalizeImageUrl(val);
+
+    const updated = [...images];
+    updated[index] = val;
+    setImages(updated);
+
+    if (val.includes("pinterest.com/pin/") || val.includes("pin.it/")) {
+      setResolvingIndex(index);
+      try {
+        const res = await fetch(`/api/resolve-image?url=${encodeURIComponent(val)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.resolvedUrl) {
+            const resolved = [...images];
+            resolved[index] = data.resolvedUrl;
+            setImages(resolved);
+            toast.success("Pinterest image link resolved!");
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setResolvingIndex(null);
+      }
+    }
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center py-24">
@@ -302,37 +333,85 @@ export default function EditProductPage() {
         </div>
 
         {/* Images */}
-        <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-6 space-y-3">
-          <div className="flex items-center gap-2">
-            <ImagePlus size={14} className="text-gold/60" />
-            <h3 className="font-semibold text-white text-sm">Product Images</h3>
+        <div className="bg-[#0d0d10] rounded-2xl border border-white/6 p-6 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <ImagePlus size={15} className="text-gold/60" />
+              <h3 className="font-semibold text-white text-sm">Product Images</h3>
+            </div>
+            <span className="text-[11px] text-gold/80 flex items-center gap-1.5 bg-gold/10 px-2.5 py-1 rounded-full border border-gold/15">
+              <Sparkles size={11} /> Supports Google Drive & Pinterest
+            </span>
           </div>
+
+          <p className="text-white/40 text-xs leading-relaxed">
+            Paste image links from any website, <strong className="text-white/70">Google Drive</strong> (set access to &quot;Anyone with the link&quot;), or <strong className="text-white/70">Pinterest</strong> (pin URLs and direct image links are auto-converted to high resolution).
+          </p>
+
           {images.map((img, i) => (
-            <div key={i} className="flex gap-2">
-              <input type="url" value={img}
-                onChange={e => { const u = [...images]; u[i] = e.target.value; setImages(u); }}
-                placeholder={`Image ${i + 1} URL`} className={inputCls} />
+            <div key={i} className="flex gap-2 items-center">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={img}
+                  onChange={(e) => handleImageChange(i, e.target.value)}
+                  placeholder={`Image ${i + 1} URL (Google Drive, Pinterest, or any web image)`}
+                  className={inputCls}
+                />
+                {resolvingIndex === i && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-gold">
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>Resolving link…</span>
+                  </div>
+                )}
+              </div>
               {images.length > 1 && (
-                <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))}
-                  className="p-2.5 text-red-400/50 hover:text-red-400 hover:bg-red-500/8 rounded-xl transition-colors shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setImages(images.filter((_, j) => j !== i))}
+                  className="p-2.5 text-red-400/50 hover:text-red-400 hover:bg-red-500/8 rounded-xl transition-colors shrink-0"
+                >
                   <X size={15} />
                 </button>
               )}
             </div>
           ))}
+
           {images.length < 6 && (
-            <button type="button" onClick={() => setImages([...images, ""])}
-              className="flex items-center gap-2 text-xs text-gold/70 hover:text-gold font-medium transition-colors">
-              <Plus size={13} /> Add image
+            <button
+              type="button"
+              onClick={() => setImages([...images, ""])}
+              className="flex items-center gap-2 text-xs text-gold/70 hover:text-gold font-medium transition-colors"
+            >
+              <Plus size={13} /> Add another image
             </button>
           )}
-          {images.some(u => u.startsWith("http")) && (
-            <div className="flex gap-3 flex-wrap pt-1">
-              {images.filter(u => u.startsWith("http")).map((url, i) => (
-                <div key={i} className="w-16 h-16 rounded-xl overflow-hidden border border-white/8">
-                  <img src={url} alt="" className="w-full h-full object-cover" />
-                </div>
-              ))}
+
+          {/* Previews */}
+          {images.some((u) => u && u.startsWith("http")) && (
+            <div className="space-y-2 pt-2">
+              <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest block">Live Previews</span>
+              <div className="flex gap-3 flex-wrap">
+                {images
+                  .filter((u) => u && u.startsWith("http"))
+                  .map((url, i) => (
+                    <div
+                      key={i}
+                      className="relative w-20 h-20 rounded-xl overflow-hidden border border-white/10 bg-brand-obsidian group shadow-sm"
+                    >
+                      <img
+                        src={getProductImage(url)}
+                        alt={`Preview ${i + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        referrerPolicy="no-referrer"
+                        onError={handleImageFallback}
+                      />
+                      <div className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] text-white/80 text-center py-0.5 font-mono">
+                        Img {i + 1}
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </div>

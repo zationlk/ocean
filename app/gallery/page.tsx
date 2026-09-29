@@ -5,6 +5,7 @@ import { X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { GalleryItem } from "@/lib/types";
+import { normalizeImageUrl, handleImageFallback } from "@/lib/image-utils";
 
 const categories = ["All", "Commercial", "Residential", "Outdoor", "Industrial"];
 
@@ -120,10 +121,12 @@ export default function GalleryPage() {
               >
                 <div className={cn("relative overflow-hidden", heights[idx % heights.length])}>
                   <img
-                    src={item.image}
+                    src={normalizeImageUrl(item.image)}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"
+                    referrerPolicy="no-referrer"
+                    onError={handleImageFallback}
                   />
                   <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/50 transition-all duration-300 flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 backdrop-blur-sm rounded-full p-3">
@@ -183,9 +186,11 @@ export default function GalleryPage() {
 
           <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
             <img
-              src={lightboxItem.image}
+              src={normalizeImageUrl(lightboxItem.image)}
               alt={lightboxItem.title}
               className="max-w-full max-h-[75vh] rounded-2xl object-contain mx-auto"
+              referrerPolicy="no-referrer"
+              onError={handleImageFallback}
             />
             <div className="mt-4 text-center">
               <h3 className="text-white font-semibold text-lg">{lightboxItem.title}</h3>

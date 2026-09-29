@@ -7,6 +7,7 @@ import { GitCompare, X, ArrowLeft, Check, Minus, MessageCircle } from "lucide-re
 import { SiteSettings } from "@/lib/types";
 import { fetchSettingsCached } from "@/lib/settings-cache";
 import { buildProductWhatsAppMessage } from "@/lib/utils";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 const DEFAULT_SETTINGS: SiteSettings = {
   companyName: "",
@@ -137,9 +138,11 @@ export default function ComparePage() {
                     </button>
                     <div className="h-40 rounded-xl overflow-hidden bg-brand-bg mb-4">
                       <img
-                        src={item.image}
+                        src={getProductImage(item.image)}
                         alt={item.name}
                         className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        onError={handleImageFallback}
                       />
                     </div>
                     <div className="text-xs text-brand-primary font-semibold uppercase tracking-wider mb-1">

@@ -4,6 +4,7 @@ import { useCompare } from "@/context/CompareContext";
 import Link from "next/link";
 import { X, GitCompare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 export default function CompareBar() {
   const { items, remove, clear } = useCompare();
@@ -26,7 +27,13 @@ export default function CompareBar() {
                 key={item.id}
                 className="flex items-center gap-2 bg-brand-obsidian rounded-xl px-3 py-2 border border-brand-border"
               >
-                <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
+                <img
+                  src={getProductImage(item.image)}
+                  alt={item.name}
+                  className="w-8 h-8 rounded-lg object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={handleImageFallback}
+                />
                 <span className="text-sm text-white max-w-[140px] truncate font-medium">{item.name}</span>
                 <button
                   onClick={() => remove(item.id)}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, MapPin, Building2, Sparkles, CheckCircle, Package } from "lucide-react";
+import { normalizeImageUrl, handleImageFallback } from "@/lib/image-utils";
 
 const categoryColors: Record<string, string> = {
   Hospitality: "bg-purple-50 text-purple-700 border border-purple-100",
@@ -79,10 +80,12 @@ export default function ProjectsPage() {
             >
               <div className={`relative overflow-hidden ${index === 0 ? "h-80" : "h-64"}`}>
                 <img
-                  src={project.image}
+                  src={normalizeImageUrl(project.image)}
                   alt={project.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
+                  onError={handleImageFallback}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2">

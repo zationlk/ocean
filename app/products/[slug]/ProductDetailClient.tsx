@@ -10,6 +10,7 @@ import { useCompare } from "@/context/CompareContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { cn, buildProductWhatsAppMessage } from "@/lib/utils";
 import { fetchSettingsCached } from "@/lib/settings-cache";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 interface Props {
   product: Product;
@@ -125,9 +126,11 @@ export default function ProductDetailClient({ product, related }: Props) {
               onClick={() => setZoomed(true)}
             >
               <img
-                src={product.images?.[activeImage] || "/logo.png"}
+                src={getProductImage(product.images?.[activeImage])}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                referrerPolicy="no-referrer"
+                onError={handleImageFallback}
               />
               {/* Zoom hint */}
               <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 text-white text-xs">
@@ -159,7 +162,13 @@ export default function ProductDetailClient({ product, related }: Props) {
                         : "border-brand-border hover:border-gold/40 opacity-60 hover:opacity-100"
                     )}
                   >
-                    <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={getProductImage(img)}
+                      alt={`View ${i + 1}`}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                      onError={handleImageFallback}
+                    />
                   </button>
                 ))}
               </div>
@@ -346,7 +355,13 @@ export default function ProductDetailClient({ product, related }: Props) {
                   className="group bg-brand-charcoal rounded-xl border border-brand-border hover:border-gold/30 overflow-hidden transition-all"
                 >
                   <div className="h-32 overflow-hidden">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img
+                      src={getProductImage(item.image)}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                      onError={handleImageFallback}
+                    />
                   </div>
                   <div className="p-3">
                     <div className="text-[10px] text-gold font-bold uppercase tracking-wider mb-0.5">{item.category?.replace(/-/g, " ")}</div>
@@ -366,10 +381,12 @@ export default function ProductDetailClient({ product, related }: Props) {
             <X size={20} />
           </button>
           <img
-            src={product.images?.[activeImage] || "/logo.png"}
+            src={getProductImage(product.images?.[activeImage])}
             alt={product.name}
             className="max-w-full max-h-[90vh] object-contain rounded-xl"
             onClick={(e) => e.stopPropagation()}
+            referrerPolicy="no-referrer"
+            onError={handleImageFallback}
           />
           {product.images?.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">

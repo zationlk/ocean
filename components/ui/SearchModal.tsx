@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 
 interface Category {
   id: string;
@@ -195,10 +196,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     >
                       <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-brand-obsidian">
                         <img
-                          src={product.images?.[0] || "/logo.png"}
+                          src={getProductImage(product.images?.[0])}
                           alt={product.name}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onError={handleImageFallback}
                         />
                       </div>
                       <div className="flex-1 min-w-0">

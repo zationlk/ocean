@@ -7,6 +7,7 @@ import { Category } from "@/lib/types";
 import { deleteProduct, toggleFeatured, toggleNew } from "@/lib/admin-actions";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { getProductImage, handleImageFallback } from "@/lib/image-utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Product {
@@ -239,9 +240,13 @@ export default function AdminProductsPage() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#0a0a0c] shrink-0 border border-white/5">
-                            <img src={product.images?.[0] || ""} alt={product.name}
+                            <img
+                              src={getProductImage(product.images?.[0])}
+                              alt={product.name}
                               className="w-full h-full object-cover"
-                              onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=80&q=60"; }} />
+                              referrerPolicy="no-referrer"
+                              onError={handleImageFallback}
+                            />
                           </div>
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-white/80 truncate max-w-[180px] group-hover:text-white transition-colors">
