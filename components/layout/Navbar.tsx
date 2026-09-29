@@ -141,13 +141,10 @@ export default function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0 group">
-              <Image
+              <img
                 src="/logo.png"
                 alt="Ocean Lighting Solutions"
-                width={160}
-                height={52}
                 className="h-10 md:h-12 w-auto object-contain group-hover:opacity-90 transition-opacity"
-                priority
               />
             </Link>
 

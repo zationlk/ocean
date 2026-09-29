@@ -295,7 +295,7 @@ function QuickViewModal({ product, onClose }: { product: Product; onClose: () =>
               <X size={18} />
             </button>
             <motion.img
-              src={product.images?.[activeImage] || "/logo.png"}
+              src={getProductImage(product.images?.[activeImage])}
               alt={product.name}
               className="max-w-full max-h-[90vh] object-contain rounded-2xl"
               initial={{ scale: 0.9 }}

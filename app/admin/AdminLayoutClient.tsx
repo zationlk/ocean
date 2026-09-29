@@ -37,7 +37,7 @@ function SidebarContent({ pathname, onLinkClick, onLogout }: {
       <div className="flex items-center gap-3 px-5 py-5 border-b border-white/5 shrink-0">
         <Link href="/admin/dashboard" className="flex items-center gap-3 group" onClick={onLinkClick}>
           <div className="relative w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 overflow-hidden flex items-center justify-center shrink-0">
-            <Image src="/logo.png" alt="Logo" width={36} height={36} className="object-contain" />
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
           </div>
           <div>
             <div className="text-sm font-bold text-white tracking-wide leading-none">Ocean Lighting</div>
