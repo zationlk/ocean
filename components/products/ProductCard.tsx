@@ -32,6 +32,12 @@ interface Product {
   is_featured?: boolean;
   is_new?: boolean;
   badge?: string;
+  parentId?: string | number | null;
+  parent_id?: string | number | null;
+  isVariant?: boolean;
+  is_variant?: boolean;
+  variantAttributes?: Record<string, string>;
+  variant_attributes?: Record<string, string>;
 }
 
 const WA_SVG = (
@@ -175,8 +181,28 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Model Number */}
           {product.modelNumber && (
-            <div className="text-[10px] text-white/25 font-mono mb-1.5">
-              Model: {product.modelNumber}
+            <div className="text-[10px] text-white/30 font-mono mb-1.5 flex items-center justify-between">
+              <span>Model: {product.modelNumber}</span>
+              {(product.isVariant || product.is_variant) && (
+                <span className="text-[8px] font-bold uppercase tracking-wider text-gold/70 bg-gold/10 px-1.5 py-0.5 rounded border border-gold/15">
+                  Variant
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Variant attribute pills */}
+          {((product.variantAttributes && Object.keys(product.variantAttributes).length > 0) ||
+            (product.variant_attributes && Object.keys(product.variant_attributes).length > 0)) && (
+            <div className="flex gap-1.5 flex-wrap mb-2">
+              {Object.entries(product.variantAttributes || product.variant_attributes || {}).map(([k, val]) => (
+                <span
+                  key={k}
+                  className="text-[9px] bg-white/6 text-white/70 border border-white/10 px-2 py-0.5 rounded-md font-medium"
+                >
+                  {val}
+                </span>
+              ))}
             </div>
           )}
 

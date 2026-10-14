@@ -12,10 +12,13 @@ export interface Database {
       products: {
         Row: {
           id: string
+          parent_id: number | string | null
+          is_variant: boolean
           name: string
           slug: string
           category: string
           subcategory: string | null
+          model_number: string | null
           description: string
           short_description: string
           images: string[]
@@ -24,15 +27,19 @@ export interface Database {
           is_featured: boolean
           is_new: boolean | null
           badge: string | null
+          variant_attributes: Json | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
+          parent_id?: number | string | null
+          is_variant?: boolean
           name: string
           slug: string
           category: string
           subcategory?: string | null
+          model_number?: string | null
           description: string
           short_description: string
           images?: string[]
@@ -41,15 +48,19 @@ export interface Database {
           is_featured?: boolean
           is_new?: boolean | null
           badge?: string | null
+          variant_attributes?: Json | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
+          parent_id?: number | string | null
+          is_variant?: boolean
           name?: string
           slug?: string
           category?: string
           subcategory?: string | null
+          model_number?: string | null
           description?: string
           short_description?: string
           images?: string[]
@@ -58,6 +69,7 @@ export interface Database {
           is_featured?: boolean
           is_new?: boolean | null
           badge?: string | null
+          variant_attributes?: Json | null
           created_at?: string
           updated_at?: string
         }

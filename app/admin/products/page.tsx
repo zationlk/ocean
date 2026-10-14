@@ -12,14 +12,21 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface Product {
   id: string; name: string; slug: string; category: string;
+  modelNumber?: string; model_number?: string;
+  parentId?: string | null; parent_id?: string | null;
+  isVariant?: boolean; is_variant?: boolean;
+  variantAttributes?: Record<string, string>;
   shortDescription?: string; short_description?: string; description?: string;
   images: string[]; isFeatured?: boolean; isNew?: boolean;
   is_featured?: boolean; is_new?: boolean; badge?: string;
 }
 
-function normalise(p: Product): Product {
+function normalise(p: any): Product {
   return {
     ...p,
+    id: String(p.id),
+    isVariant: !!(p.isVariant ?? p.is_variant),
+    modelNumber: p.modelNumber || p.model_number || "",
     isFeatured: !!(p.isFeatured ?? p.is_featured),
     isNew:      !!(p.isNew      ?? p.is_new),
     shortDescription: p.shortDescription ?? p.short_description ?? p.description ?? "",
@@ -66,6 +73,7 @@ export default function AdminProductsPage() {
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState("");
   const [catFilter,    setCatFilter]    = useState("all");
+  const [variantFilter, setVariantFilter] = useState<"all" | "parents" | "variants">("all");
   const [deletingId,   setDeletingId]   = useState<string | null>(null);
   const [confirmItem,  setConfirmItem]  = useState<Product | null>(null);
   const [togglingId,   setTogglingId]   = useState<string | null>(null);
@@ -147,10 +155,14 @@ export default function AdminProductsPage() {
 
   const filtered = products.filter(p => {
     const q = search.toLowerCase();
-    return (
-      (!q || p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)) &&
-      (catFilter === "all" || p.category === catFilter)
-    );
+    const matchesSearch = !q || p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || p.modelNumber?.toLowerCase().includes(q);
+    const matchesCat = catFilter === "all" || p.category === catFilter;
+    const matchesVariant =
+      variantFilter === "all" ||
+      (variantFilter === "parents" && !p.isVariant) ||
+      (variantFilter === "variants" && p.isVariant);
+
+    return matchesSearch && matchesCat && matchesVariant;
   });
 
   return (
@@ -197,6 +209,12 @@ export default function AdminProductsPage() {
               className="bg-[#0a0a0c] text-white/60 border border-white/8 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-gold/40 transition-all cursor-pointer">
               <option value="all">All Categories</option>
               {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+            </select>
+            <select value={variantFilter} onChange={e => setVariantFilter(e.target.value as any)}
+              className="bg-[#0a0a0c] text-white/60 border border-white/8 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-gold/40 transition-all cursor-pointer">
+              <option value="all">All Products</option>
+              <option value="parents">Standalone / Parents</option>
+              <option value="variants">Variants Only</option>
             </select>
           </div>
 
@@ -249,10 +267,18 @@ export default function AdminProductsPage() {
                             />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-sm font-medium text-white/80 truncate max-w-[180px] group-hover:text-white transition-colors">
-                              {product.name}
+                            <div className="text-sm font-medium text-white/80 truncate max-w-[220px] group-hover:text-white transition-colors flex items-center gap-1.5">
+                              {product.isVariant && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gold/15 text-gold border border-gold/25 shrink-0">
+                                  VARIANT
+                                </span>
+                              )}
+                              <span className="truncate">{product.name}</span>
                             </div>
-                            <div className="text-[11px] text-white/25 truncate max-w-[180px]">{product.shortDescription}</div>
+                            <div className="text-[11px] text-white/30 truncate max-w-[220px] flex items-center gap-2">
+                              {product.modelNumber && <span className="font-mono text-white/45">{product.modelNumber}</span>}
+                              {product.shortDescription && <span>• {product.shortDescription}</span>}
+                            </div>
                           </div>
                         </div>
                       </td>

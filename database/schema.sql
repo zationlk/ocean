@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS categories (
 -- Products table
 CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  parent_id INT NULL DEFAULT NULL,
+  is_variant BOOLEAN DEFAULT FALSE,
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   category VARCHAR(100) NOT NULL,
@@ -34,6 +36,7 @@ CREATE TABLE IF NOT EXISTS products (
   is_featured BOOLEAN DEFAULT FALSE,
   is_new BOOLEAN DEFAULT FALSE,
   badge VARCHAR(100),
+  variant_attributes JSON,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_slug (slug),
@@ -41,7 +44,9 @@ CREATE TABLE IF NOT EXISTS products (
   INDEX idx_model_number (model_number),
   INDEX idx_is_featured (is_featured),
   INDEX idx_is_new (is_new),
-  INDEX idx_created_at (created_at)
+  INDEX idx_created_at (created_at),
+  INDEX idx_parent_id (parent_id),
+  INDEX idx_is_variant (is_variant)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Projects table

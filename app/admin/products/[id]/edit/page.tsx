@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Category } from "@/lib/types";
 import { updateProduct, buildSlug } from "@/lib/admin-actions";
 import { normalizeImageUrl, getProductImage, handleImageFallback } from "@/lib/image-utils";
+import ProductVariationManager, { VariantItem } from "@/components/admin/ProductVariationManager";
 import toast from "react-hot-toast";
 
 const inputCls = "w-full px-4 py-3 bg-[#0a0a0c] text-white border border-white/8 rounded-xl text-sm outline-none focus:border-gold/50 focus:ring-2 focus:ring-gold/8 transition-all placeholder:text-white/20";
@@ -55,6 +56,7 @@ export default function EditProductPage() {
   });
   const [features, setFeatures] = useState<string[]>([""]);
   const [specs,    setSpecs]    = useState<{ key: string; value: string }[]>([{ key: "", value: "" }]);
+  const [variants, setVariants] = useState<VariantItem[]>([]);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -128,6 +130,27 @@ export default function EditProductPage() {
       setFeatures(product.features?.length ? product.features : [""]);
       const sp = product.specifications ? Object.entries(product.specifications).map(([k, v]) => ({ key: k, value: v as string })) : [{ key: "", value: "" }];
       setSpecs(sp.length ? sp : [{ key: "", value: "" }]);
+
+      // Load variants for this product
+      try {
+        const vRes = await fetch(`/api/products?parent_id=${encodeURIComponent(product.id)}`);
+        if (vRes.ok) {
+          const vData = await vRes.json();
+          if (Array.isArray(vData) && vData.length > 0) {
+            setVariants(vData.map((v: any) => ({
+              id: String(v.id),
+              name: v.name,
+              modelNumber: v.modelNumber || v.model_number || "",
+              badge: v.badge || "",
+              images: v.images || [],
+              variantAttributes: v.variantAttributes || v.variant_attributes || {},
+              specifications: v.specifications || {},
+            })));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load product variants:", err);
+      }
     } catch {
       toast.error("Failed to load product");
     } finally { setLoading(false); }
@@ -161,6 +184,17 @@ export default function EditProductPage() {
       is_featured:       form.isFeatured,
       is_new:            form.isNew,
       badge:             form.badge.trim(),
+      variants:          variants.map(v => ({
+        id:              v.id,
+        name:            v.name.trim(),
+        model_number:    v.modelNumber?.trim() || null,
+        badge:           v.badge?.trim() || null,
+        images:          v.images && v.images.length > 0 && v.images[0] ? v.images : images.filter(u => u.trim()),
+        variant_attributes: v.variantAttributes,
+        specifications:  { ...specsObj, ...v.specifications, ...v.variantAttributes },
+        is_featured:     false,
+        is_new:          form.isNew,
+      })),
     };
 
     const { error } = await updateProduct(productId, payload);
@@ -455,6 +489,15 @@ export default function EditProductPage() {
             <Plus size={13} /> Add specification
           </button>
         </div>
+
+        {/* Product Variations */}
+        <ProductVariationManager
+          baseProductName={form.name}
+          baseModelNumber={form.modelNumber}
+          baseImages={images.filter(u => u.trim())}
+          variants={variants}
+          onChange={setVariants}
+        />
 
         <div className="flex gap-4 pt-1">
           <button type="submit" disabled={saving}

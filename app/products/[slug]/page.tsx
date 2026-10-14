@@ -33,6 +33,13 @@ function normaliseProduct(p: any): Product {
 
   return {
     ...p,
+    id: String(p.id),
+    parentId: p.parent_id ? String(p.parent_id) : null,
+    parent_id: p.parent_id ? String(p.parent_id) : null,
+    isVariant: !!(p.is_variant || p.isVariant),
+    is_variant: !!(p.is_variant || p.isVariant),
+    variantAttributes: safeParseJson<Record<string, string>>(p.variant_attributes, {}),
+    variant_attributes: safeParseJson<Record<string, string>>(p.variant_attributes, {}),
     modelNumber: p.model_number || p.modelNumber || "",
     images: imagesArray,
     specifications,
@@ -48,9 +55,23 @@ function normaliseProduct(p: any): Product {
 
 async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const rows = await query("SELECT * FROM products WHERE slug = ? LIMIT 1", [slug]) as any[];
+    const rows = await query("SELECT * FROM products WHERE slug = ? OR id = ? LIMIT 1", [slug, slug]) as any[];
     if (!rows || rows.length === 0) return null;
-    return normaliseProduct(rows[0]);
+    const product = normaliseProduct(rows[0]);
+
+    // Fetch all products in this family (the parent and all sibling variants)
+    const effectiveParentId = product.parentId || product.id;
+    const familyRows = await query(
+      "SELECT * FROM products WHERE parent_id = ? OR id = ? ORDER BY id ASC",
+      [effectiveParentId, effectiveParentId]
+    ) as any[];
+
+    if (familyRows && familyRows.length > 0) {
+      product.variants = familyRows.map(normaliseProduct);
+      product.parent = product.variants.find(v => v.id === String(effectiveParentId)) || null;
+    }
+
+    return product;
   } catch (err) {
     console.error("Error fetching product by slug:", err);
     return null;

@@ -1,18 +1,28 @@
 export interface Product {
   id: string;
+  parentId?: string | number | null;
+  parent_id?: string | number | null;
+  isVariant?: boolean;
+  is_variant?: boolean;
   name: string;
   slug: string;
   category: string;
   subcategory?: string;
   modelNumber?: string;
+  model_number?: string;
   description: string;
   shortDescription: string;
+  short_description?: string;
   images: string[];
   specifications?: Record<string, string>;
   features?: string[];
   isFeatured: boolean;
   isNew?: boolean;
   badge?: string;
+  variantAttributes?: Record<string, string>;
+  variant_attributes?: Record<string, string>;
+  variants?: Product[];
+  parent?: Product | null;
   createdAt: string;
   updatedAt: string;
 }

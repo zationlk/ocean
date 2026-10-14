@@ -12,6 +12,10 @@ export interface ProductPayload {
   is_featured: boolean;
   is_new: boolean;
   badge: string;
+  parent_id?: string | number | null;
+  is_variant?: boolean;
+  variant_attributes?: Record<string, string>;
+  variants?: any[];
 }
 
 function slugify(name: string): string {
