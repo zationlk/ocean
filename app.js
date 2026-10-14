@@ -180,9 +180,9 @@ const server = http.createServer(async (req, res) => {
     const hasGit = fs.existsSync(path.join(__dirname, '.git'));
     let syncCmd;
     if (hasGit) {
-      syncCmd = `git fetch origin main && git checkout origin/main -- .next`;
+      syncCmd = `git fetch origin main && git reset --hard origin/main`;
     } else {
-      syncCmd = `curl -sL https://codeload.github.com/zationlk/ocean/tar.gz/refs/heads/main | tar -xzf - --strip-components=1 ocean-main/.next`;
+      syncCmd = `curl -sL https://codeload.github.com/zationlk/ocean/tar.gz/refs/heads/main | tar -xzf - --strip-components=1 ocean-main/.next ocean-main/app ocean-main/components ocean-main/lib ocean-main/hooks ocean-main/context ocean-main/public`;
     }
 
     log(`Running sync command: ${syncCmd}`);
@@ -208,7 +208,7 @@ const server = http.createServer(async (req, res) => {
         fixPermissionsRecursively(path.join(__dirname, '.next'));
       } catch (e) {}
 
-      const checkFile = path.join(__dirname, '.next', 'server', 'pages-manifest.json');
+      const checkFile = path.join(__dirname, '.next', 'server', 'app-paths-manifest.json');
       if (fs.existsSync(checkFile)) {
         log('.next sync successful! Initializing Next.js...');
         initNext();
@@ -234,6 +234,107 @@ const server = http.createServer(async (req, res) => {
       res.write(`Execution error: ${err.message}</pre></body></html>`);
       res.end();
     });
+    return;
+  }
+
+  // --------------------------------------------------------------------------
+  // Special Endpoint: /build-on-server (git pull + npm run build on the server)
+  // --------------------------------------------------------------------------
+  if (parsedUrl.pathname === '/build-on-server') {
+    if (isSyncing) {
+      res.statusCode = 429;
+      res.setHeader('Content-Type', 'text/plain');
+      res.end('A build is already in progress. Please wait...');
+      return;
+    }
+
+    isSyncing = true;
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ocean Lighting — Build on Server</title>
+  <style>
+    body { font-family: monospace; background: #0b0c10; color: #f8fafc; padding: 30px; line-height: 1.6; }
+    h1 { color: #d4af37; }
+    pre { background: #07080a; color: #a5f3fc; padding: 20px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.2); max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-size: 13px; }
+    .success { color: #4ade80; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .error { color: #f87171; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .btn { display: inline-block; background: #d4af37; color: #0a0a0c; padding: 12px 24px; text-decoration: none; border-radius: 10px; margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🏗️ Building Ocean Lighting on Server...</h1>
+  <p style="color:#94a3b8;">This page streams live output. Do not close until you see a success/error message.</p>
+  <pre>`);
+
+    const npmBin = findNpm();
+    const steps = [
+      `git fetch origin main`,
+      `git reset --hard origin/main`,
+      `${npmBin} run build`,
+    ];
+
+    log(`[BUILD-ON-SERVER] Starting: ${steps.join(' && ')}`);
+
+    async function runStepSequentially(stepIndex) {
+      if (stepIndex >= steps.length) {
+        // All done — check for success
+        isSyncing = false;
+        const checkFile = path.join(__dirname, '.next', 'server', 'app-paths-manifest.json');
+        if (fs.existsSync(checkFile)) {
+          log('[BUILD-ON-SERVER] ✅ Build verified! Re-initializing Next.js...');
+          initNext();
+          res.write(`</pre>
+          <div class="success">✅ Build completed successfully! Next.js is restarting.</div>
+          <p style="color:#94a3b8; margin-top:10px;">Your new code is now live. Run <a href="/api/migrate" style="color:#d4af37;">/api/migrate</a> to apply any database changes.</p>
+          <a class="btn" href="/">🚀 Visit Website</a>
+          <a class="btn" style="background:transparent;border:1px solid rgba(212,175,55,0.4);color:#d4af37;margin-left:10px;" href="/api/migrate">Run DB Migration</a>
+          </body></html>`);
+        } else {
+          log('[BUILD-ON-SERVER] ⚠️ Build may have failed — app-paths-manifest.json not found.');
+          res.write(`</pre>
+          <div class="error">⚠️ Build did not produce expected output. Check logs above.</div>
+          </body></html>`);
+        }
+        res.end();
+        return;
+      }
+
+      const cmd = steps[stepIndex];
+      res.write(`\n$ ${cmd}\n`);
+      log(`[BUILD-ON-SERVER] Running: ${cmd}`);
+
+      const shell = '/bin/sh';
+      const child = spawn(shell, ['-c', cmd], { cwd: __dirname, env: { ...process.env, NODE_ENV: 'production' } });
+
+      child.stdout.on('data', (d) => { res.write(d.toString()); });
+      child.stderr.on('data', (d) => { res.write(d.toString()); });
+
+      child.on('close', (code) => {
+        if (code !== 0 && stepIndex < 2) { // git errors are warnings; npm build failure is fatal
+          res.write(`\n⚠️ Step exited with code ${code}. Continuing...\n`);
+        }
+        if (code !== 0 && stepIndex === 2) {
+          isSyncing = false;
+          res.write(`</pre><div class="error">❌ npm run build failed (exit code ${code}). Check output above.</div></body></html>`);
+          res.end();
+          return;
+        }
+        runStepSequentially(stepIndex + 1);
+      });
+
+      child.on('error', (err) => {
+        isSyncing = false;
+        res.write(`\nError: ${err.message}</pre><div class="error">❌ Failed to spawn: ${cmd}</div></body></html>`);
+        res.end();
+      });
+    }
+
+    runStepSequentially(0);
     return;
   }
 

@@ -3,8 +3,8 @@ node_modules/
 /.pnp
 .pnp.js
 
-# Next.js build output (ignore cache only, keep production server/static for cPanel)
-/.next/cache/
+# Next.js build output — built on server via /build-on-server endpoint
+/.next/
 /out/
 *.zip
 create-deploy-zip.js
